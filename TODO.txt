@@ -1,0 +1,9 @@
+
+ - When given a LP and not an IP, add checks to getTotalNodeCount() and getBestBound() to avoid CPLEX error:
+      CPLEX Error  3003: Not a mixed-integer problem.
+ 
+
+ - Add LP printing option? used in Tesco no reversal
+ - Add user and lazy cuts before optimisation?
+ - To incumbent callback add Check(CPXsetintparam(env, CPX_PARAM_MIPCBREDLP, CPX_OFF), env);
+
