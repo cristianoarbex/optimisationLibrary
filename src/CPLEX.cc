@@ -561,7 +561,7 @@ bool CPLEX::isSolutionLimit() {
 }
 
 bool CPLEX::isTimeLimit() {
-    return status == CPX_STAT_ABORT_TIME_LIM; 
+    return status == CPX_STAT_ABORT_TIME_LIM || isMIPTimeLimitFeasible() || isMIPTimeLimitInfeasible();
 }
 
 bool CPLEX::isMIPTimeLimitFeasible() {
