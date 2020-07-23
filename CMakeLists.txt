@@ -6,14 +6,14 @@ set(CMAKE_USER_MAKE_RULES_OVERRIDE
 set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cxx_flag_overrides.cmake)
 
-project(MMST)
+project(OPW)
 
-#set(MMST_VERSION_MAJOR 0)
-#set(MMST_VERSION_MINOR 1)
-#set(PACKAGE_VERSION ${MMST_VERSION_MAJOR}.${MMST_VERSION_MINOR})
+#set(OPW_VERSION_MAJOR 0)
+#set(OPW_VERSION_MINOR 1)
+#set(PACKAGE_VERSION ${OPW_VERSION_MAJOR}.${MMST_VERSION_MINOR})
 
-#set(MMST_COMPILED ssd${MMST_VERSION_MAJOR}${MMST_VERSION_MINOR})
-set(MMST_COMPILED mmst)
+#set(OPW_COMPILED ssd${MMST_VERSION_MAJOR}${MMST_VERSION_MINOR})
+set(OPW_COMPILED opw)
 
 # Static so I can copy the executable to another version
 # Check link for other possible options:
