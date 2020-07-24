@@ -1,6 +1,6 @@
 # OPW
 
-(1) install CPLEX and/or GLPK
+(1) install IBM CPLEX and/or the GNU Linear Programming Kit (GLPK)
 
 (2) install Boost
 
