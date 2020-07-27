@@ -1,7 +1,9 @@
-# Generalized assignment problem
+# Generalized Assignment Problem (GAP)
 
- The first 12 data files are gap1, gap2, ..., gap12.
-  
+These instances are provided by the OR-Library, maintained by J.E. Beasley
+
+http://people.brunel.ac.uk/~mastjjb/jeb/orlib/gapinfo.html
+
  The problems in these data files were used in:
 
       I.H. Osman, "Heuristics for the Generalised Assignment Problem:
@@ -27,14 +29,15 @@
 
  The problems in each data file have an associated notation as
  follows:
-  
+ ```
  c515-1    :    denotes a problem of type c with 5-agents and
                 15-jobs, problem number 1 in a group of
                 problems of the same size.
-  
+ ```
+ 
  The optimal solution values are given below for these 
  problems when solved as maximisation problems.
-
+```
   
  gap1           gap2           gap3           gap4
  c515-1  336    c520-1  434    c525-1  580    c530-1  656
@@ -56,5 +59,6 @@
  c1030-3  712    c1040-3  960    c1050-3  1195   c1060-3  1433
  c1030-4  723    c1040-4  947    c1050-4  1171   c1060-4  1447
  c1030-5  706    c1040-5  947    c1050-5  1171   c1060-5  1446
+```
 
 The largest file is gap12 of size 20Kb (approximately).
