@@ -25,7 +25,7 @@ class SolverError {
 
 
 /**
- * Solver, superclass of cplex, gurobi, etc.
+ * Solver, superclass of cplex, glpk, gurobi, etc.
  */
 class Solver {
 

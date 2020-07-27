@@ -8,6 +8,7 @@
 
 #include "Model.h"
 #include "CPLEX.h"
+#include "GLPK.h"
 #include "Options.h"
 
 
@@ -21,6 +22,8 @@ Model::Model() {
     
     if (solverUsed.compare("cplex") == 0) {
         solver = new CPLEX();
+    } else if (solverUsed.compare("glpk") == 0) {
+        solver = new GLPK();
     } else {
         solver = new Solver();
     }

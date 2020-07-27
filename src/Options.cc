@@ -53,6 +53,7 @@ void Options::assignDefaultValues() {
 
     vector<string> solverValues;
     solverValues.push_back("cplex");
+    solverValues.push_back("glpk");
     
     vector<string> modelValues;
     modelValues.push_back("toy");

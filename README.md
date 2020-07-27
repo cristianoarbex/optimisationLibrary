@@ -1,9 +1,12 @@
 # OPW
 
-(1) install IBM CPLEX and/or the GNU Linear Programming Kit (GLPK)
+(1) install one of the currently supported solvers: the IBM CPLEX and the GNU Linear Programming Kit (GLPK)
 
-(2) install Boost
+(2) install the Boost C++ Libraries
 
-(3) opw/build$ cmake ..
+## Building
+```
+$ opw/build$ cmake ..
 
-(4) opw/build$ make
+$ opw/build$ make
+```
