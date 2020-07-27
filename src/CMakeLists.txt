@@ -29,6 +29,8 @@ add_executable(${OPW_COMPILED}
       # models
       DataCapitalBudgeting.h  DataCapitalBudgeting.cc
       ModelCapitalBudgeting.h ModelCapitalBudgeting.cc
+      DataGAP.h               DataGAP.cc
+      ModelGAP.h              ModelGAP.cc
       )
 
 target_link_libraries(${OPW_COMPILED} m)

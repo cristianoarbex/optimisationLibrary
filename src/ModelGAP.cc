@@ -25,14 +25,11 @@ void ModelGAP::execute(const Data* data) {
     createModel(data);
     reserveSolutionSpace(data);
     assignWarmStart();
-    setSolverParameters();
-    
-    //pausa pra ver o modelo
-    //std::cin.get();
+    setSolverParameters(1); // 1 = maximization
     
     solver->addInfoCallback(this);
     
-    solve();
+    solve(data);
     totalTime = Util::getTime() - startTime;
     printSolutionVariables();
 }

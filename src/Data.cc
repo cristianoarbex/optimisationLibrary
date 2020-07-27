@@ -11,7 +11,7 @@
 
 
 Data::Data() {
-    debug =  Options::getInstance()->getIntOption("debug");
+    debug = Options::getInstance()->getIntOption("debug");
 }
 
 Data::~Data() {

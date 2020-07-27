@@ -11,13 +11,7 @@
  *
  * Format: --optionName=value
  * 
- * Example: ./ssd --debug=1
- *
- * The exception is the input file. Its format is just its name.
- *
- * Example: ./ssd inputFile --debug=1
- *
- * 
+ * Example: ./opw --debug=1
  * ----------------------------------------------
  */
 
@@ -37,7 +31,10 @@ class Options {
         /**
          * Instancia singleton desta classe.
          */
-         static Options* instance;
+        static Options* instance;
+        
+        // input file, must be provided (no name for this option)
+        string inputFile;
 
         vector<Option*> options;
         map<string, int> optionsMap;
@@ -69,6 +66,9 @@ class Options {
         string getAllOptionsAsText();
         string getOutputOptionsAsText();
         string getModifiedOptionsAsText();
+
+        // input file
+        string getInputFile()   { return inputFile; }
 
         // get option values
         bool                getBoolOption       (string name);
