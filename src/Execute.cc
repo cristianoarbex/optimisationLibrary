@@ -10,6 +10,8 @@
 #include "Options.h"
 #include "DataCapitalBudgeting.h"
 #include "ModelCapitalBudgeting.h"
+#include "DataGAP.h"
+#include "ModelGAP.h"
 
 
 Execute::Execute() {
@@ -27,9 +29,12 @@ Execute::~Execute() {
 void Execute::execute() {
     float startTime = Util::getTime();
      
-    if (Options::getInstance()->getStringOption("model").compare("toy") == 0) {
+    if (Options::getInstance()->getStringOption("model").compare("cbp") == 0) {
         data  = new DataCapitalBudgeting();
         model = new ModelCapitalBudgeting();
+    } else if (Options::getInstance()->getStringOption("model").compare("gap") == 0) {
+        data  = new DataGAP();
+        model = new ModelGAP();
     } else {
         data  = new Data();
         model = new Model();

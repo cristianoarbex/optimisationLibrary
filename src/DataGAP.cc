@@ -2,6 +2,7 @@
 #include "Options.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 
 DataGAP::DataGAP() : Data() {
     numVariables = 0;
@@ -13,27 +14,19 @@ DataGAP::~DataGAP() {
 
 
 void DataGAP::readData() {
+    
     if (debug) printf("Initialising data for the Generalised Assignment Problem\n\n");
+    
+    std::ifstream inputFile;
+    
+    // string file_path = Options::getInstance()->getInputFile();
+    string file_path = Options::getInstance()->getStringOption("input");
 
-    
-    // reading from file
-    // info http://people.brunel.ac.uk/~mastjjb/jeb/orlib/gapinfo.html
-    /* The format for each of these data files is:
-  
-     number of agents (m), number of jobs (n)
-     for each agent i (i=1,...,m) in turn:
-         cost of allocating job j to agent i (j=1,...,n)
-     for each agent i (i=1,...,m) in turn:
-         resource consumed in allocating job j to agent i (j=1,...,n)
-     resource capacity of agent i (i=1,...,m)   
-    */ 
-    
-    std::ifstream infile;
-    infile.open("../src/GAPinstances.txt");
-    if (infile.is_open()) {
+    inputFile.open(file_path);
+    if (inputFile.is_open()) {
       
-        infile >> numVariables; 
-        infile >> numTasks;
+        inputFile >> numVariables; 
+        inputFile >> numTasks;
         
         agentBudget.resize(numVariables);
         profitMatrix.resize(numTasks);
@@ -45,21 +38,21 @@ void DataGAP::readData() {
         
         for (int j = 0; j < numVariables; j++) {
             for (int i = 0; i < numTasks; i++) {
-                infile >> profitMatrix[i][j];
+                inputFile >> profitMatrix[i][j];
             }
         }
         for (int j = 0; j < numVariables; j++) {
             for (int i = 0; i < numTasks; i++) {
-                infile >> weightMatrix[i][j];   
+                inputFile >> weightMatrix[i][j];   
             }
         }
         for (int j = 0; j < numVariables; j++) {
-            infile >> agentBudget[j];
+            inputFile >> agentBudget[j];
         }
     }
     else std::cout << "Unable to open file\n"; 
    
-    infile.close();
+    inputFile.close();
 
 }
 

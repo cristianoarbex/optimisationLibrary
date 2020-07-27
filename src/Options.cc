@@ -18,7 +18,7 @@
 
 Options* Options::instance = new Options();
 
-Options* Options::getInstance () {
+Options* Options::getInstance() {
 	return instance;
 }
 
@@ -56,7 +56,8 @@ void Options::assignDefaultValues() {
     solverValues.push_back("glpk");
     
     vector<string> modelValues;
-    modelValues.push_back("toy");
+    modelValues.push_back("capital-budgeting");
+    modelValues.push_back("gap");
     
     vector<string> empty;
    
@@ -282,7 +283,7 @@ void Options::print() {
 
 void Options::printHelp() {
     printf("Usage:\n");
-    printf("tesco <data-file> [options]\n");
+    printf("opw <data-file> [options]\n");
     printf("\n");
     printf("Options:\n");
     for (int i = 0; i < (int)options.size(); i++) {
