@@ -56,7 +56,7 @@ void Options::assignDefaultValues() {
     solverValues.push_back("glpk");
     
     vector<string> modelValues;
-    modelValues.push_back("capital-budgeting");
+    modelValues.push_back("cbp");
     modelValues.push_back("gap");
     
     vector<string> empty;
