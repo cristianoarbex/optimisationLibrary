@@ -1,12 +1,12 @@
-# OPW
+# opw
 
-`opw` is a wrapper in C++ for modeling, implementing and solving optimization problems.
+`opw` is a wrapper library in C++ for commercial and open source solvers
 
 ## Setup 
 
-(1) Install one of the currently supported solvers: the IBM CPLEX and the GNU Linear Programming Kit (GLPK)
+(1) Install at least one of the currently supported solvers: IBM CPLEX and GNU Linear Programming Kit (GLPK)
 
-(2) Install the Boost C++ Libraries
+(2) Install Boost
 
 ## Building
 ```
@@ -18,7 +18,7 @@ $ opw/build$ make
 ## Running
 ```
 Usage:
-opw [input] [options]
+opw input [options]
 ```
 
 To solve the Generalized Assigment Problem using GLPK with default options for the solver, simply run from inside the `build/` directory:
