@@ -10,8 +10,7 @@
 
 
 #include <string.h>
-#include <sstream>
-#include <iostream>
+#include <regex>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -167,6 +166,66 @@ int Util::stringToDouble(string text, double& number) {
     else return 1;
 }
 
+double Util::stringToDouble(string text) {
+    return std::stod(text);
+}
+
+
+
+
+////////////////////////////
+////////////////////////////
+////////////////////////////
+// STRING   ////////////////
+////////////////////////////
+
+vector<string> Util::split(const string& i_str, const string& i_delim, int eliminateEmptySubstrings) { 
+    vector<string> result;
+    
+    size_t found = i_str.find(i_delim);
+    size_t startIndex = 0;
+
+    while(found != string::npos) {
+        result.push_back(string(i_str.begin()+startIndex, i_str.begin()+found));
+        startIndex = found + i_delim.size();
+        found = i_str.find(i_delim, startIndex);
+        if (eliminateEmptySubstrings && result[result.size()-1].empty()) result.pop_back();
+    }
+    if (startIndex != i_str.size())
+        result.push_back(string(i_str.begin()+startIndex, i_str.end()));
+    return result;  
+}
+
+string Util::join(const vector<string>& strings, const string& separator) {
+    string ret = "";
+    for (unsigned i = 0; i < strings.size(); i++) {
+        ret += strings[i];
+        if (i < strings.size()-1) ret += separator;
+    }
+    return ret;
+}
+
+
+string Util::toLowerCase(string data) {
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::tolower(c); });
+    return data;
+}
+
+string Util::toUpperCase(string data) {
+    std::transform(data.begin(), data.end(), data.begin(), [](unsigned char c){ return std::toupper(c); });
+    return data;
+}
+
+int Util::isNumber(string s) {
+    char* p;
+    strtod(s.c_str(), &p);
+    return *p == 0;
+}
+
+int Util::isEqual(string s, string c) {
+    return !s.compare(c);
+}
+
 ////////////////////////////
 ////////////////////////////
 ////////////////////////////
@@ -214,12 +273,45 @@ void Util::throwInvalidArgument(string msg, ...) {
     throw std::invalid_argument(thr.c_str());
 }
 
+void Util::stop(string msg, ...) {
+    if (msg.empty()) {
+        throw std::invalid_argument("");
+    }
+    int final_n, n = ((int)msg.size()) * 2; /* reserve 2 times as much as the length of the msg */
+    string str;
+    std::unique_ptr<char[]> formatted;
+    va_list ap;
+    while(1) {
+        formatted.reset(new char[n]); /* wrap the plain char array into the unique_ptr */
+        strcpy(&formatted[0], msg.c_str());
+        va_start(ap, msg);
+        final_n = vsnprintf(&formatted[0], n, msg.c_str(), ap);
+        va_end(ap);
+        if (final_n < 0 || final_n >= n)
+            n += abs(final_n - n + 1);
+        else
+            break;
+    }
+    string thr = formatted.get();
+    throw std::invalid_argument(thr.c_str());
+}
+
 
 ////////////////////////////
 ////////////////////////////
 ////////////////////////////
 // PRINT ///////////////////
 ////////////////////////////
+
+void Util::printStringVector(const vector<string> vec, string initialText, string separator) {
+    if (!initialText.empty()) printf("%s: ", initialText.c_str());
+    for (unsigned i = 0; i < vec.size(); i++) {
+        printf("%s", vec[i].c_str());
+        if (i < vec.size()-1) printf("%s", separator.c_str());
+    } 
+    printf("\n");
+}
+
 
 void Util::printIntVector(const vector<int> &vec, int tot, int numPerLine) {
     int count = 0;
@@ -305,17 +397,20 @@ void Util::printDoubleMatrix(const vector<vector<double> > &vec, int tot, int de
     }
 }
 
-void Util::printIntMatrix(const vector<vector<int> > &vec, int tot) {
+void Util::printIntMatrix(const vector<vector<int> > &vec, int tot, int printRowNames) {
 
     unsigned max = 0;
     for (unsigned i = 0; i < vec.size(); i++) {
         if (vec[i].size() > max) max = vec[i].size();
     }
     
+    int digits = numDigits(vec.size() - 1);
+    if (printRowNames) printf("%*s ", digits, "");
     for (unsigned i = 0; i < max; i++) printf("%*d ", tot, i);
     printf("\n");
     
     for (unsigned i = 0; i < vec.size(); i++) {
+        if (printRowNames) printf("%*d ", digits, i);
         for (unsigned m = 0; m < max; m++) {
             if (vec[i].size() <= m) {
                 printf("%*s ", tot, "");

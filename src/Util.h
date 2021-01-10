@@ -24,6 +24,7 @@
 #define TAU                             1e-5
 #define TOLERANCE                       1e-6
 #define TOLERANCE_VIOLATION             1e-5
+#define UND                              "_"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,58 +33,67 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <set>
 #include <algorithm>
 #include <map>
 #include <utility>
 #include <stdexcept>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <math.h>
-#include <boost/lexical_cast.hpp>
+//#include <boost/lexical_cast.hpp>
 #include <type_traits>
-#include "boost/throw_exception.hpp"
+//#include "boost/throw_exception.hpp"
 
 using std::string;
 using std::vector;
+using std::set;
 using std::map;
 
 inline string lex(int l) {
-    return boost::lexical_cast<string>(l);
+    //return boost::lexical_cast<string>(l);
+    return std::to_string(l);
 }
 
-#ifdef _WIN32
-namespace boost {
-template<class E> inline void throw_exception(E const & e) {
-  throw e;
-}
-}
-namespace detail {
-
-template<typename T>
-inline std::string
-to_string(T const val, std::false_type /*is_float*/, std::false_type /*is_unsigned*/) {
-    return std::to_string(static_cast<long long>(val));
-}
-
-template<typename T>
-inline std::string
-to_string(T const val, std::false_type /*is_float*/, std::true_type /*is_unsigned*/) {
-    return std::to_string(static_cast<unsigned long long>(val));
-}
-
-template<typename T, typename _>
-inline std::string
-to_string(T const val, std::true_type /*is_float*/, _) {
-    return std::to_string(static_cast<long double>(val));
-}
-
-} // namespace detail
-
-template<typename T>
-inline std::string to_string(T const val) {
-    return detail::to_string(val, std::is_floating_point<T>(), std::is_unsigned<T>());
-}
-#else 
-using std::to_string;
-#endif
+// I don't remember why I put this here in the first place. I think it was before C++11 was
+// used to I'll comment this code to see if any problem happens. I commented to stop using boost
+//#ifdef _WIN32
+//namespace boost {
+//template<class E> inline void throw_exception(E const & e) {
+//  throw e;
+//}
+//}
+//namespace detail {
+//
+//template<typename T>
+//inline std::string
+//to_string(T const val, std::false_type /*is_float*/, std::false_type /*is_unsigned*/) {
+//    return std::to_string(static_cast<long long>(val));
+//}
+//
+//template<typename T>
+//inline std::string
+//to_string(T const val, std::false_type /*is_float*/, std::true_type /*is_unsigned*/) {
+//    return std::to_string(static_cast<unsigned long long>(val));
+//}
+//
+//template<typename T, typename _>
+//inline std::string
+//to_string(T const val, std::true_type /*is_float*/, _) {
+//    return std::to_string(static_cast<long double>(val));
+//}
+//
+//} // namespace detail
+//
+//template<typename T>
+//inline std::string to_string(T const val) {
+//    return detail::io_string(val, std::is_floating_point<T>(), std::is_unsigned<T>());
+//}
+//#else 
+//using std::to_string;
+//#endif
+//*/
 
 ////////////////////////////////////////
 ////////////////////////////////////////
@@ -117,9 +127,11 @@ class Util {
          * Exception handler
          */
         static void throwInvalidArgument(string msg, ...);
+        static void stop(string msg, ...);
 
         // 0 success, 1 failure
         static int stringToDouble(string text, double& number);
+        static double stringToDouble(string text);
 
         // General
         static int numDigits(int number);
@@ -133,6 +145,15 @@ class Util {
             std::vector<T> newVec(beg, end);
             return newVec;
         };
+        
+        // String functions
+        static vector<string> split(const string& i_str, const string& i_delim, int eliminateEmptySubstrings = 1);
+        static string join(const vector<string>& strings, const string& separator);
+        static string toLowerCase(string data);
+        static string toUpperCase(string data);
+        static int isNumber(string s); 
+        static int isEqual(string s, string c);
+
 
         // print functions
         static void printIntVector(const vector<int> &vec, int tot = 3, int numPerLine = 0);
@@ -140,8 +161,9 @@ class Util {
         static void printDoubleVector(const vector<double> &vec, int tot = 5, int dec = 2, int numPerLine = 0);
         static void printTwoDoubleVectors(const vector<double> &vec1, const vector<double> &vec2, int tot1 = 5, int dec1 = 2, int tot2 = 5, int dec2 = 2);
         static void printDoubleMatrix(const vector<vector<double> > &vec, int tot = 5, int dec = 2);
-        static void printIntMatrix(const vector<vector<int> > &vec, int tot = 5);
+        static void printIntMatrix(const vector<vector<int> > &vec, int tot = 5, int printRowNames = 0);
         static void printNonZeroDoubleVector(const vector<double> &vec, int tot = 5, int dec = 2, int numPerLine = 0);
+        static void printStringVector(const vector<string> vec, string initialText = "", string separator = " ");
 
         static void printGraph(const vector<vector<int>> &graph);
         static void printGraph(const vector<vector<double>> &graph, int dec = 2);

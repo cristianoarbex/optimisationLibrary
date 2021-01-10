@@ -7,8 +7,8 @@
  */
 
 #include "Option.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/join.hpp>
+//#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string/join.hpp>
 //#include <boost/regex.hpp>
 
 inline bool isInteger(const std::string & s) {
@@ -163,7 +163,8 @@ void StringOption::checkOption(string str, string optionName) {
     } else found = true;
 
     if (!found) {
-        string joined = boost::algorithm::join(possibleValues, ", ");
+        //string joined = boost::algorithm::join(possibleValues, ", ");
+        string joined = Util::join(possibleValues, ", ");
         Util::throwInvalidArgument("Error: Option %s has invalid value (%s). Possible values are (%s).", optionName.c_str(), str.c_str(), joined.c_str());
     }
     value = str;
@@ -194,8 +195,9 @@ void ArrayOption::checkOption(string str, string optionName) {
 
     if (str.empty()) return;
 
-    vector<string> temp;
-    boost::split(temp, str, boost::is_any_of(","));
+    //vector<string> temp;
+    //boost::split(temp, str, boost::is_any_of(","));
+    vector<string> temp = Util::split(str, ",");
 
     for (unsigned i = 0; i < temp.size(); i++) {
 //#ifdef _WIN32
@@ -239,8 +241,10 @@ DoubleArrayOption::~DoubleArrayOption() {
 void DoubleArrayOption::checkOption(string str, string optionName) {
 
     if (str.empty()) return;
-    vector<string> temp;
-    boost::split(temp, str, boost::is_any_of(","));
+    //vector<string> temp;
+    //boost::split(temp, str, boost::is_any_of(","));
+    vector<string> temp = Util::split(str, ",");
+    
     for (unsigned i = 0; i < temp.size(); i++) {
         double val = 0;
         if (Util::stringToDouble(temp[i], val) != 0)
@@ -253,9 +257,7 @@ void DoubleArrayOption::checkOption(string str, string optionName) {
 string DoubleArrayOption::getValueAsString() {
     string temp = "";
     for (unsigned i = 0; i < value.size(); i++) {
-        char buffer[30];
-        sprintf(buffer, "%.2f", value[i]);
-        temp = temp + buffer;
+        temp = temp + lex(value[i]);
         if (i < value.size()-1) temp = temp + ",";
     }
     return temp;
@@ -289,12 +291,14 @@ void MatrixOption::checkOption(string str, string optionName) {
 
     if (str.empty()) return;
 
-    vector<string> temp;
-    boost::split(temp, str, boost::is_any_of(":"));
+    //vector<string> temp;
+    //boost::split(temp, str, boost::is_any_of(":"));
+    vector<string> temp = Util::split(str, ":");
 
     for (unsigned i = 0; i < temp.size(); i++) {
-        vector<string> temp2;
-        boost::split(temp2, temp[i], boost::is_any_of(","));
+        //vector<string> temp2;
+        //boost::split(temp2, temp[i], boost::is_any_of(","));
+        vector<string> temp2 = Util::split(temp[i], ",");
 
         value.push_back(vector<int>());
         for (unsigned j = 0; j < temp2.size(); j++) {

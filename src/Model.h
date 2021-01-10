@@ -33,6 +33,12 @@ class Model {
        double timeLimit;
        int isMax;
 
+       // Whether this model is only intended to capture cuts added by the solver
+       // If this is set to 1 then only the first LP relaxation will be soved and the
+       // cuts added by the solver will be read into the function getExtraCuts below
+       int captureCuts;
+       SolverCut extractSolverCut(string name, vector<string> cons);
+
        // General times
        double totalTime;
        double solvingTime;
@@ -136,6 +142,11 @@ class Model {
         void setTimeLimit(double time);
 
         void overrideDebug(int d);
+
+        void setCaptureCuts(int c);
+        int shouldCaptureCuts() {return captureCuts;};
+
+        void getExtraCuts(vector<SolverCut>& sc);
 };    
 
 #endif 

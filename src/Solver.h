@@ -51,6 +51,7 @@ class Solver {
         Solver();
         virtual ~Solver();
         virtual void deleteAndRecreateProblem() {}
+        virtual void readProblem(string filename) {}
 
 
         // Map
@@ -157,6 +158,7 @@ class SolverCut {
     
     private: 
         
+        string name;
         vector<int> indices;
         vector<double> coefs;
         
@@ -200,6 +202,10 @@ class SolverCut {
             coefs.push_back(coef);
         }
 
+        void setName(string n) {
+            name = n;
+        }
+
         void addCoefs(vector<int> &index, vector<double> &coef) {
             indices.insert(indices.end(), index.begin(), index.end());
             coefs.insert(coefs.end(), coef.begin(), coef.end());
@@ -212,25 +218,31 @@ class SolverCut {
         void setRHS(double v) {
             rhs = v;
         }
+ 
+        void setSense(char s) {
+            if (s != 'L' && s != 'G' && s != 'E')
+                Util::stop("Error in setSense: Invalid char %c (valid values are 'L', 'E' and 'G').", s);
+            sense = s;
+        }
+
         
 
-        void print(Solver *solver) {
-            for (int i = 0; i < (int) coefs.size(); i++) {
-                string name = solver->getColName(indices[i]);
-                if (i > 0 && coefs[i] > 0) printf(" + ");
-                printf("%.5f %s", coefs[i], name.c_str());
+        void print(Solver *solver, int digits = 5) {
+            if (!name.empty()) {
+                printf("%s: ", name.c_str());
+            }
+            for (unsigned i = 0; i < coefs.size(); i++) {
+                string variableName = solver->getColName(indices[i]);
+                if (i > 0 && coefs[i] > 0) printf("+ ");
+                if (coefs[i] < 0) printf("- ");
+                printf("%.*f %s", digits, coefs[i] < 0 ? -coefs[i] : coefs[i], variableName.c_str());
+                if (i < coefs.size()-1) printf(" ");
             }
             printf(" %s %.8f\n", sense == 'L' ? " <= " : sense == 'E' ? " == " : " >= ", rhs);
         }
 
-
-        void setSense(char s) {
-            if (s != 'L' && s != 'G' && s != 'E')
-                Util::throwInvalidArgument("Error in setSense: Invalid char %c (valid values are 'L', 'E' and 'G').", s);
-            sense = s;
-        }
-
-
+       
+        string          getName() { return name;                      }
         int         getNumCoefs() { return (int)coefs.size();         }
         double           getRHS() { return rhs;                       }
         char           getSense() { return sense;                     }

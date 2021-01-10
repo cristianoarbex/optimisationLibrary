@@ -48,6 +48,13 @@ void CPLEX::deleteAndRecreateProblem() {
     Check(status, env);
 }
 
+void CPLEX::readProblem(string filename) {
+    Check(CPXfreeprob(env, &problem));
+    printf("Filename: %s\n", filename.c_str());
+    status = CPXreadcopyprob(env, problem, filename.c_str(), NULL);    
+    Check(status, env);
+}
+
 void CPLEX::printSolverName() {
     printf("Solver used is CPLEX\n");
 }
@@ -613,11 +620,11 @@ void CPLEX::addUserCutCallback(void* userData) {
 }
 
 void CPLEX::addIncumbentCallback(void* userData) {
+    Check(CPXsetintparam(env, CPX_PARAM_MIPCBREDLP, CPX_OFF), env);
     Check(CPXsetincumbentcallbackfunc(env, incumbentCallback, userData), env);
 }
 
 void CPLEX::addInfoCallback(void* userData) {
-    Check(CPXsetintparam(env, CPX_PARAM_MIPCBREDLP, CPX_OFF), env);
     Check(CPXsetinfocallbackfunc(env, infoCallback, userData), env);
 }
 
@@ -706,8 +713,8 @@ int CPXPUBLIC CPLEX::infoCallback(CPXCENVptr env, void* cbdata, int wherefrom, v
 int CPXPUBLIC CPLEX::solveCallback(CPXCENVptr env, void* cbdata, int wherefrom, void* cbhandle, int* useraction_p) {
 
     Model* model = static_cast<Model*>(cbhandle);
-    
-    if (model->shouldExportMoreSolverModels()) {
+
+    if (model->shouldExportMoreSolverModels() && !model->shouldCaptureCuts()) {
         CPXLPptr  nodelp;
         CPXgetcallbacknodelp (env, cbdata, wherefrom, &nodelp);
         int counter = model->getCurrentSolverModel();
@@ -721,6 +728,13 @@ int CPXPUBLIC CPLEX::solveCallback(CPXCENVptr env, void* cbdata, int wherefrom, 
         }
         model->addExportedSolverModel();
     }
+
+    if (model->shouldCaptureCuts()) {
+        CPXLPptr  nodelp;
+        CPXgetcallbacknodelp (env, cbdata, wherefrom, &nodelp);
+        CPXwriteprob (env, nodelp, model->getSolverModelFilename().c_str(), NULL);
+    }
+
 
     return 0;
 }

@@ -10,7 +10,6 @@
 #include "CPLEX.h"
 #include "Options.h"
 
-
 /**
  * INITIAL METHODS
  *
@@ -91,6 +90,9 @@ void Model::setTimeLimit(double time) {
     timeLimit = time;
 }
     
+void Model::setCaptureCuts(int c) {
+    captureCuts = c;
+}
 
 void Model::setSolverParameters(int isMaximisation, string modelFilename, string solverModelFile) {
 
@@ -127,15 +129,20 @@ void Model::setSolverParameters(int isMaximisation, string modelFilename, string
                           gomory, gub, implbd, mir, mcf, zerohalf);
 
     solver->setLPMethod(Options::getInstance()->getIntOption("lp_method"));
-    if (Options::getInstance()->getBoolOption("first_node_only")) solver->setNodeLimit(1);
 
-    if ( Options::getInstance()->getBoolOption("export_model"))      solver->exportModel(modelFilename.c_str());
+    if (!captureCuts) {
+        if (Options::getInstance()->getBoolOption("first_node_only")) solver->setNodeLimit(1);
+        if ( Options::getInstance()->getBoolOption("export_model"))      solver->exportModel(modelFilename.c_str());
     
-    maxExportedSolverModels = Options::getInstance()->getIntOption("export_cplex_cuts");
-    if (maxExportedSolverModels) solver->addSolveCallback(this);
-
-
-
+        maxExportedSolverModels = Options::getInstance()->getIntOption("export_cplex_cuts");
+        if (maxExportedSolverModels) solver->addSolveCallback(this);
+    } else {
+        solver->setNodeLimit(1);
+        modelFilename       = "temporaryModel1.lp";
+        solverModelFilename = "temporaryModel2.lp";
+        solver->exportModel(modelFilename.c_str());
+        solver->addSolveCallback(this);
+    }
 }
 
 int Model::shouldExportMoreSolverModels() {
@@ -172,3 +179,134 @@ void Model::firstNodeBoundCallbackFunction(double bound) {
     firstNodeSolved = true;
 }
 
+void Model::getExtraCuts(vector<SolverCut>& sc) {
+    if (!captureCuts) Util::stop("This function can only be called if captureCuts = 1");
+    sc.resize(0);
+
+    string filename1 = "temporaryModel1.lp";
+    string filename2 = "temporaryModel2.lp";
+    
+    vector<string> constraintsOriginal;
+    
+    // Reading original model
+    std::ifstream file(filename1);
+    if (file.is_open()) {
+        string line;
+        string delim = " ";
+        int foundConstraints = 0;
+        while (std::getline(file, line)) {
+            vector<string> temp = Util::split(line, delim);
+
+            if (temp.size() >= 1 && !Util::toLowerCase(temp[0]).compare("bounds")) foundConstraints = 0;
+            if (foundConstraints && temp.size()) {
+                if (temp[0].back() == ':') {
+                    temp[0].pop_back();
+                    constraintsOriginal.push_back(temp[0]);
+                }
+            }
+            if (temp.size() >= 2 && !Util::toLowerCase(temp[0]).compare("subject") && !Util::toLowerCase(temp[1]).compare("to")) foundConstraints = 1;
+        }
+        file.close();
+    }
+
+    // Reading augmented model
+    std::ifstream file2(filename2);
+    if (file2.is_open()) {
+        string line;
+        string delim = " ";
+        int foundConstraints = 0;
+        int foundBounds      = 0;
+        int boundCounter     = 0;
+        
+        vector<string> newConstraint;
+        string newConstraintName = "";
+        
+        while (std::getline(file2, line)) {
+            vector<string> temp = Util::split(line, delim);
+ 
+            if (foundBounds) {
+                if (find(temp.begin(), temp.end(), "=") != temp.end() || find(temp.begin(), temp.end(), "==") != temp.end()) {
+                    if (temp.size() == 3) {
+                        if (!Util::isNumber(temp[2])) Util::stop("A bound is weird in getExtraCuts: %s\n", line.c_str());
+                        SolverCut s;
+                        s.setName("variableBound" + lex(boundCounter));
+                        s.addCoef(solver->getColIndex(temp[0]), 1);
+                        s.setSense('E');
+                        s.setRHS(Util::stringToDouble(temp[2]));
+                        sc.push_back(s);
+                        boundCounter++;
+                    } else {
+                        Util::stop("A bound is weird in getExtraCuts: %s\n", line.c_str());
+                    }
+                }
+            }
+
+            if (temp.size() >= 1 && !Util::toLowerCase(temp[0]).compare("bounds")) {
+                foundConstraints = 0;
+                foundBounds = 1;
+            }
+            
+            if (foundConstraints && temp.size()) {
+                if (temp[0].back() == ':') {
+                    
+                    if (newConstraint.size()) sc.push_back(extractSolverCut(newConstraintName, newConstraint));
+
+                    newConstraint.resize(0);
+                    newConstraintName = temp[0];
+                    newConstraintName.pop_back();
+                    if (find(constraintsOriginal.begin(), constraintsOriginal.end(), newConstraintName) != constraintsOriginal.end()) 
+                        newConstraintName = "";
+                        
+                    
+                }
+                if (!newConstraintName.empty()) {
+                    for (int i = 0; i < (int) temp.size(); i++) {
+                        if (i == 0 && temp[i].back() == ':') continue;
+                        newConstraint.push_back(temp[i]);
+                    }
+                }
+            }
+            if (temp.size() >= 2 && !Util::toLowerCase(temp[0]).compare("subject") && !Util::toLowerCase(temp[1]).compare("to")) {
+                if (newConstraint.size()) sc.push_back(extractSolverCut(newConstraintName, newConstraint));
+                foundConstraints = 1;
+
+            }
+           
+        }
+        file2.close();
+    }
+}
+
+SolverCut Model::extractSolverCut(string name, vector<string> cons) {
+    SolverCut sc;
+    sc.setName(name); 
+
+    double coef = 1;
+    int foundRHS = 0;
+    for (unsigned i = 0; i < cons.size(); i++) {
+        if (Util::isEqual(cons[i], "-")) {
+            coef = -coef;
+        } else if (Util::isEqual(cons[i], "+")) {
+            // Do nothing
+        } else if (Util::isNumber(cons[i])) {
+            double c = Util::stringToDouble(cons[i]);
+            if (coef < 0) coef = -c;
+            else          coef = c;
+            foundRHS = 1;
+        } else if (Util::isEqual(cons[i], "<=")) {
+            sc.setSense('L');
+        } else if (Util::isEqual(cons[i], ">=")) {
+            sc.setSense('G');
+        } else if (Util::isEqual(cons[i], "=") || Util::isEqual(cons[i], "==")) {
+            sc.setSense('E');
+        } else if (!cons[i].empty()) {
+            sc.addCoef(solver->getColIndex(cons[i]), coef);
+            coef = 1;
+            foundRHS = 0;
+        }
+    }
+    if (!foundRHS) Util::stop("When trying to read cuts from the solver model file, the RHS is missing.");
+    sc.setRHS(coef);
+    //sc.print(solver, 1);
+    return sc;
+}

@@ -7,8 +7,8 @@
  */
 
 #include "Options.h"
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/join.hpp>
+//#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string/join.hpp>
 //#include <boost/regex.hpp>
 
 /**
@@ -63,7 +63,7 @@ void Options::assignDefaultValues() {
     double imax = std::numeric_limits<int>::max();
 
     // Debug options
-    options.push_back(new IntOption ("debug",             "Level of debug information [0-4, 0 means no debug]", 1, 0, 4, 0));
+    options.push_back(new IntOption ("debug",             "Level of debug information [0-4, 0 means no debug]", 1, 2, 4, 0));
     options.push_back(new BoolOption("first_node_only",   "Solve only first node", 1, 0));
     options.push_back(new BoolOption("export_model",      "If (1) exports model to lp file", 1, 0));
     options.push_back(new IntOption ("export_cplex_cuts", "Number of intermediate models with cplex cuts to export to lp file", 1, 0, imax, 0));
@@ -127,8 +127,8 @@ bool Options::getBoolOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
         BoolOption* b = dynamic_cast<BoolOption*>(options[optionsMap[name]]);
         if (b != 0) return b->getValue();
-        else Util::throwInvalidArgument("Error: Attempting to get boolean value from option %s which is not boolean.", name.c_str());
-    } else Util::throwInvalidArgument("Error: Attempting to get value from non-existing option %s.", name.c_str());
+        else Util::stop("Error: Attempting to get boolean value from option %s which is not boolean.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
     return false;
 }
 
@@ -136,8 +136,8 @@ int Options::getIntOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
         IntOption* b = dynamic_cast<IntOption*>(options[optionsMap[name]]);
         if (b != 0) return b->getValue();
-        else Util::throwInvalidArgument("Error: Attempting to get integer value from option %s which is not integer.", name.c_str());
-    } else Util::throwInvalidArgument("Error: Attempting to get value from non-existing option %s.", name.c_str());
+        else Util::stop("Error: Attempting to get integer value from option %s which is not integer.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
     return 0;
 }
 
@@ -145,8 +145,8 @@ double Options::getDoubleOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
         DoubleOption* b = dynamic_cast<DoubleOption*>(options[optionsMap[name]]);
         if (b != 0) return b->getValue();
-        else Util::throwInvalidArgument("Error: Attempting to get double value from option %s which is not double.", name.c_str());
-    } else Util::throwInvalidArgument("Error: Attempting to get value from non-existing option %s.", name.c_str());
+        else Util::stop("Error: Attempting to get double value from option %s which is not double.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
     return 0;
 }
 
@@ -154,8 +154,8 @@ string Options::getStringOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
         StringOption* b = dynamic_cast<StringOption*>(options[optionsMap[name]]);
         if (b != 0) return b->getValue();
-        else Util::throwInvalidArgument("Error: Attempting to get string value from option %s which is not string.", name.c_str());
-    } else Util::throwInvalidArgument("Error: Attempting to get value from non-existing option %s.", name.c_str());
+        else Util::stop("Error: Attempting to get string value from option %s which is not string.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
     return 0;
 }
 
@@ -163,8 +163,8 @@ vector<int> Options::getArrayOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
         ArrayOption* b = dynamic_cast<ArrayOption*>(options[optionsMap[name]]);
         if (b != 0) return b->getValue();
-        else Util::throwInvalidArgument("Error: Attempting to get array from option %s which is not an array option.", name.c_str());
-    } else Util::throwInvalidArgument("Error: Attempting to get value from non-existing option %s.", name.c_str());
+        else Util::stop("Error: Attempting to get array from option %s which is not an array option.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
     return vector<int>();
 }
 
@@ -172,8 +172,8 @@ vector<double> Options::getDoubleArrayOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
         DoubleArrayOption* b = dynamic_cast<DoubleArrayOption*>(options[optionsMap[name]]);
         if (b != 0) return b->getValue();
-        else Util::throwInvalidArgument("Error: Attempting to get array from option %s which is not a double array option.", name.c_str());
-    } else Util::throwInvalidArgument("Error: Attempting to get value from non-existing option %s.", name.c_str());
+        else Util::stop("Error: Attempting to get array from option %s which is not a double array option.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
     return vector<double>();
 }
 
@@ -182,8 +182,8 @@ vector<vector<int>> Options::getMatrixOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
         MatrixOption* b = dynamic_cast<MatrixOption*>(options[optionsMap[name]]);
         if (b != 0) return b->getValue();
-        else Util::throwInvalidArgument("Error: Attempting to get matrix from option %s which is not a matrix option.", name.c_str());
-    } else Util::throwInvalidArgument("Error: Attempting to get value from non-existing option %s.", name.c_str());
+        else Util::stop("Error: Attempting to get matrix from option %s which is not a matrix option.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
     return vector<vector<int>>();
 }
 
@@ -202,7 +202,7 @@ void Options::parseOptions(int numOptions, char* pairs[]) {
     // Empty argv
     if (numOptions == 1) {
         printHelp();
-        Util::throwInvalidArgument("");
+        Util::stop("");
     }
 
     for (int i = 1; i < numOptions; i++) {
@@ -212,8 +212,10 @@ void Options::parseOptions(int numOptions, char* pairs[]) {
         if (op.size() < 2) fail = 1;
         if (op[0] != '-' || op[1] != '-') fail = 1;
         if (fail == 0) op.erase(0, 2);
-        vector<string> temp;
-        boost::split(temp, op, boost::is_any_of("="));
+
+        //vector<string> temp;
+        //boost::split(temp, op, boost::is_any_of("="));
+        vector<string> temp = Util::split(op, "=");
         
         //if (boost::regex_search(op.c_str(), boost::regex("^--[^-=]*=[^=]*$"))) {
         //    op.erase(0, 2);
@@ -222,16 +224,15 @@ void Options::parseOptions(int numOptions, char* pairs[]) {
         if (!fail && temp.size() == 2) {
             changeOptionValue(temp[0], temp[1]);
         } else {
-            Util::throwInvalidArgument("Error: Invalid option %s", op.c_str());
+            Util::stop("Error: Invalid option %s", op.c_str());
         }
     }
 
     specificChecks();
-
 }
 
 void Options::specificChecks() {
-    if (Options::getInstance()->getStringOption("input").empty()) Util::throwInvalidArgument("Error: Input file was not provided");
+    if (Options::getInstance()->getStringOption("input").empty()) Util::stop("Error: Input file was not provided");
     
 }
 
@@ -240,7 +241,7 @@ void Options::changeOptionValue(string optionName, string value) {
         int index = optionsMap[optionName];
         options[index]->checkOption(value, optionName);
     } else {
-        Util::throwInvalidArgument("Error: Option %s was not recognised.", optionName.c_str());
+        Util::stop("Error: Option %s was not recognised.", optionName.c_str());
     }
 }
 

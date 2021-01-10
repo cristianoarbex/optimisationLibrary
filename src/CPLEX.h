@@ -39,6 +39,7 @@ class CPLEX : public Solver {
         CPLEX();
         virtual ~CPLEX();
         virtual void deleteAndRecreateProblem();
+        virtual void readProblem(string filename);
         
 
         // Set data
