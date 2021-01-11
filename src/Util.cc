@@ -10,7 +10,6 @@
 
 
 #include <string.h>
-#include <regex>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -53,6 +52,9 @@ long gettimeofday(struct timezone * tzp) {
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <memory>
+#include <random>
+#include <chrono>
+
 
 ////////////////////////////
 ////////////////////////////
@@ -632,6 +634,48 @@ float Util::randomNumberAlexandre(double* ix) {
 
         /* multiplica por 1/(2**31-1)*/
         return(*ix*4.656612875e-10);
+}
+
+// Generates N random doubles which sum to 1
+std::vector<double> Util::randomN(int N, bool allowNeg, double maxNeg) {
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    int first = allowNeg ? -1 : 0;
+    std::uniform_real_distribution<double> unif(first,1);
+    std::default_random_engine re(seed);
+    std::vector<double> result;
+    double sum = 0;
+    double sumNeg = 0;
+    double sumPos = 0;
+    double curr;
+
+    for(int i = 0; i < N; i++) {
+        curr = unif(re);
+        result.push_back(curr);
+        sum += result[i];
+    }
+
+    for(int i = 0; i < N; i++) {
+        result[i] /= sum;
+    }
+
+    // We can't let the negative values go over the limit
+    for(int i = 0; i < N; i++) {
+        if (result[i] < 0) sumNeg -= result[i];
+        else sumPos += result[i];
+    }
+    // If we surpass the limit, we set the proportions to have a sum of -maxNeg
+    // the negative numbers and maxNeg + 1 for the positive ones, so when we sum
+    // everything we get a total of 1
+    if (sumNeg > maxNeg) {
+        for(int i = 0; i < N; i++) {
+            if (result[i] < 0)
+                result[i] /= (sumNeg / maxNeg);
+            else
+                result[i] /= (sumPos / (maxNeg + 1));
+        }
+    }
+
+    return result;
 }
 
 

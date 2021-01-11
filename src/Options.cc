@@ -282,7 +282,7 @@ void Options::print() {
 
 void Options::printHelp() {
     printf("Usage:\n");
-    printf("tesco <data-file> [options]\n");
+    printf("optLib <data-file> [options]\n");
     printf("\n");
     printf("Options:\n");
     for (int i = 0; i < (int)options.size(); i++) {
@@ -296,7 +296,7 @@ void Options::printHelp() {
 string Options::getAllOptionsAsText() {
     string ret = "";
     for (int i = 0; i < (int)options.size(); i++) {
-        char buffer[300];
+        char buffer[8000];
         sprintf(buffer, "%s: %s\n", options[i]->getName().c_str(), options[i]->getValueAsString().c_str());
         ret = ret + buffer;
     }
@@ -307,7 +307,7 @@ string Options::getOutputOptionsAsText() {
     string ret = "";
     for (int i = 0; i < (int)options.size(); i++) {
         if (options[i]->getShowOutput()) {
-            char buffer[300];
+            char buffer[8000];
             sprintf(buffer, "%s: %s\n", options[i]->getName().c_str(), options[i]->getValueAsString().c_str());
             ret = ret + buffer;
         }
@@ -320,7 +320,7 @@ string Options::getModifiedOptionsAsText() {
     string ret = "";
     for (int i = 0; i < (int)options.size(); i++) {
         if (options[i]->wasChanged()) {
-            char buffer[300];
+            char buffer[8000];
             sprintf(buffer, "%s: %s\n", options[i]->getName().c_str(), options[i]->getValueAsString().c_str());
             ret = ret + buffer;
         }

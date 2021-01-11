@@ -207,6 +207,7 @@ void Model::getExtraCuts(vector<SolverCut>& sc) {
             if (temp.size() >= 2 && !Util::toLowerCase(temp[0]).compare("subject") && !Util::toLowerCase(temp[1]).compare("to")) foundConstraints = 1;
         }
         file.close();
+        remove(filename1.c_str());
     }
 
     // Reading augmented model
@@ -274,6 +275,7 @@ void Model::getExtraCuts(vector<SolverCut>& sc) {
            
         }
         file2.close();
+        remove(filename2.c_str());
     }
 }
 

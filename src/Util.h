@@ -184,6 +184,7 @@ class Util {
         static int randomAlexandre(int, double*);
         static float randomNumberAlexandre(double*);
         static unsigned long randomLongAlexandre(unsigned long, double*);
+        static std::vector<double> randomN(int, bool, double);
 
         /**
          * Comparators, sorts, permutations
