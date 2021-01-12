@@ -372,8 +372,11 @@ double CPLEX::getObjValue() {
 
 double CPLEX::getBestBound() {
     double bestBound = 0;
-    int result = CPXgetbestobjval(env, problem, &bestBound);
-    if (result != 0) bestBound = getObjValue();
+    int type = CPXgetprobtype(env, problem);
+    if (type == CPXPROB_MILP) {
+        int result = CPXgetbestobjval(env, problem, &bestBound);
+        if (result != 0) bestBound = getObjValue();
+    }
     return bestBound;
 }
 
