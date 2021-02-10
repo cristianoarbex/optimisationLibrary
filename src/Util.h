@@ -219,6 +219,14 @@ class Util {
             std::transform(p.begin(), p.end(), sorted_vec.begin(), [&](int i){ return vec[i]; });
             return sorted_vec;
         }
+
+        template <typename T, typename U>
+        static void sortVectorByAnotherVector(vector<T>& vec, const vector<U>& another, int ascending = 1) {
+            vector<int> permutation;
+            if (ascending) permutation = Util::sort_permutation(another, [](U const& a, U const& b){ return a < b; });
+            else           permutation = Util::sort_permutation(another, [](U const& a, U const& b){ return a > b; });
+            vec = Util::apply_permutation(vec, permutation);
+        }
 };    
 
 #endif 
