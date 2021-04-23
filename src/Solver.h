@@ -103,6 +103,7 @@ class Solver {
         virtual void enablePresolve(bool enable = true) {}
         
         virtual void setLPMethod(int lp) {}
+        virtual void setFeasibilityPump(int fp) {}
         virtual void setLPTolerance(double tolerance) {}
         virtual void disableDefaultCuts(bool disable = true) {}
         virtual void setSolverCuts(int solverCuts = -2, int clique   = -2, int cover    = -2, int disj = -2, int landp  = -2, 
@@ -250,6 +251,7 @@ class SolverCut {
         vector<int>  getIndices() { return indices;                   }
         unsigned  getNumIndices() { return indices.size();            }
         int       getIndex(int i) { return indices[i];                }
+        double     getCoef(int i) { return coefs[i];                  }
         double      getLastCoef() { return coefs[coefs.size()-1];     }
         int        getLastIndex() { return indices[indices.size()-1]; }
 

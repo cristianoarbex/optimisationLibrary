@@ -56,10 +56,14 @@ Model::Model() {
     firstNodeSolved   = false;
 
     totalNodes        = 0;
+
+    goodEnoughSolution = 0;
     
     counter = 0;
     debug = Options::getInstance()->getIntOption("debug");
     timeLimit = (double)Options::getInstance()->getIntOption("time_limit");
+
+    captureCuts = 0;
 }
 
 
@@ -129,6 +133,7 @@ void Model::setSolverParameters(int isMaximisation, string modelFilename, string
                           gomory, gub, implbd, mir, mcf, zerohalf);
 
     solver->setLPMethod(Options::getInstance()->getIntOption("lp_method"));
+    solver->setFeasibilityPump(Options::getInstance()->getIntOption("feasibility_pump"));
 
     if (!captureCuts) {
         if (Options::getInstance()->getBoolOption("first_node_only")) solver->setNodeLimit(1);

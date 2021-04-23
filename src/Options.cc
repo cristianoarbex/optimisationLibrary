@@ -77,26 +77,27 @@ void Options::assignDefaultValues() {
     // Solver options 
     options.push_back(new StringOption("solver",             "Choose which solver to use [Default: cplex)", 1, "cplex", solverValues));
     options.push_back(new IntOption   ("solver_debug_level", "Choose the solver debug level [Default: 2]", 1, 2, 5, 0));
-    options.push_back(new IntOption   ("time_limit",         "Time limit for the solver (in seconds, if zero time limit is not set)", 1, 21600, imax, 0));
-    options.push_back(new BoolOption  ("presolve",           "Presolve is (0) disabled or (1) enabled [Default: 1]",            1, 1));
-    options.push_back(new IntOption   ("mip_emphasis",       "MIP emphasis (0 to 4) [Default: 0]",                       1, 0, 4,  0));
-    options.push_back(new IntOption   ("lp_method",          "Set LP method [Default: 0]",                               1, 0, 6,  0));
-    options.push_back(new IntOption   ("probing_level",      "MIP probing lebel (-1 to 3) [Default: 1]",                 1, 0, 3, -1));
-    options.push_back(new IntOption   ("node_heuristic",         "MIP node heuristic frequency (-1 to inf) [Default: 0]",    1,  0, imax, -1));
-    options.push_back(new IntOption   ("branching_policy",       "From -1 to 4, choose branching policy [Default: 0]", 1, 0, 4, -1));
-    options.push_back(new BoolOption  ("solver_local_branching", "Solver local branching routine [Default: 0]", 1, 0));
-    options.push_back(new IntOption   ("solver_parallelism",     "(1) on, (0) off, (2) non-deterministic [Default: 0]", 1,  0, 2, 0));
-    options.push_back(new IntOption   ("solver_threads",         "Number of threads [Default: 1]", 1,  1, imax, 1));  
-    options.push_back(new IntOption   ("mip_strategy",       "Dynamic switch or branch-and-cut [Default: 0 (auto)]", 1,  0, 2, 0));  
+    options.push_back(new IntOption   ("time_limit",         "Time limit for the solver (in seconds, if zero time limit is not set)", 1, 21600, imax,  0));
+    options.push_back(new BoolOption  ("presolve",           "Presolve is (0) disabled or (1) enabled [Default: 1]",                               1,  1));
+    options.push_back(new IntOption   ("mip_emphasis",       "MIP emphasis (0 to 4) [Default: 0]",                                    1,     0,    4,  0));
+    options.push_back(new IntOption   ("lp_method",          "Set LP method [Default: 0]",                                            1,     0,    6,  0));
+    options.push_back(new IntOption   ("feasibility_pump",   "Solver feasibility pump heuristic [Default: 0]",                        1,     0,    2, -1));
+    options.push_back(new IntOption   ("probing_level",      "MIP probing lebel (-1 to 3) [Default: 1]",                              1,     0,    3, -1));
+    options.push_back(new IntOption   ("node_heuristic",         "MIP node heuristic frequency (-1 to inf) [Default: 0]",             1,     0, imax, -1));
+    options.push_back(new IntOption   ("branching_policy",       "From -1 to 4, choose branching policy [Default: 0]",                1,     0,    4, -1));
+    options.push_back(new BoolOption  ("solver_local_branching", "Solver local branching routine [Default: 0]",                                    1,  0));
+    options.push_back(new IntOption   ("solver_parallelism",     "(1) on, (0) off, (2) non-deterministic [Default: 0]",               1,     0,    2,  0));
+    options.push_back(new IntOption   ("solver_threads",         "Number of threads [Default: 0]",                                    1,     0, imax,  0));  
+    options.push_back(new IntOption   ("mip_strategy",       "Dynamic switch or branch-and-cut [Default: 0 (auto)]",                  1,     0,    2,  0));  
 
 
     // Solver cuts
     options.push_back(new IntOption  ("solver_cuts",    "All cuts are (-1) disabled, (0) automatic or (1-3) enabled            [Default: -1]", 1, -1, 3, -1));
+    options.push_back(new IntOption  ("gomory_cuts",    "(-1 to 2) Overrides or (-2) not the option for gomory fractional cuts [Default: -2]", 1, -2, 2, -2));
+    options.push_back(new IntOption  ("zerohalf_cuts",  "(-1 to 2) Overrides or (-2) not the option for zero-half cuts         [Default: -2]", 1, -2, 2, -2));
     options.push_back(new IntOption  ("cover_cuts",     "(-1 to 3) Overrides or (-2) not the option for cover cuts             [Default: -2]", 1, -2, 3, -2));
     options.push_back(new IntOption  ("landp_cuts",     "(-1 to 3) Overrides or (-2) not the option for lift-and-project cuts  [Default: -2]", 1, -2, 3, -2));
-    options.push_back(new IntOption  ("gomory_cuts",    "(-1 to 2) Overrides or (-2) not the option for gomory fractional cuts [Default: -2]", 1, -2, 2, -2));
     options.push_back(new IntOption  ("mir_cuts",       "(-1 to 2) Overrides or (-2) not the option for MIR cuts               [Default: -2]", 1, -2, 2, -2));
-    options.push_back(new IntOption  ("zerohalf_cuts",  "(-1 to 2) Overrides or (-2) not the option for zero-half cuts         [Default: -2]", 1, -2, 2, -2));
     options.push_back(new IntOption  ("disj_cuts",      "(-1 to 3) Overrides or (-2) not the option for disjunctive cuts       [Default: -2]", 1, -2, 3, -2));
     options.push_back(new IntOption  ("flowcover_cuts", "(-1 to 2) Overrides or (-2) not the option for flow cover cuts        [Default: -2]", 1, -2, 2, -2));
     options.push_back(new IntOption  ("mcf_cuts",       "(-1 to 2) Overrides or (-2) not the option for MCF cuts               [Default: -2]", 1, -2, 2, -2));

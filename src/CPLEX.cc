@@ -401,6 +401,11 @@ void CPLEX::setLPMethod(int lp) {
     Check(CPXsetintparam(env, CPX_PARAM_LPMETHOD, lp), env);
 }
 
+void CPLEX::setFeasibilityPump(int fp) {
+    Check(CPXsetintparam(env, CPXPARAM_MIP_Strategy_FPHeur, fp), env);
+}
+
+
 void CPLEX::setTimeLimit(double time) {
     if (time > 0) {
         Check(CPXsetdblparam(env, CPX_PARAM_TILIM, time), env);
@@ -709,6 +714,10 @@ int CPXPUBLIC CPLEX::infoCallback(CPXCENVptr env, void* cbdata, int wherefrom, v
         CPXgetcallbackinfo(env, cbdata, wherefrom, CPX_CALLBACK_INFO_BEST_REMAINING, &value);
         model->firstNodeBoundCallbackFunction(value);
     }
+    
+    // Not sure if this should be uncommented, look at Kiva version
+    //if (model->isSolutionGoodEnough(solValue)) return 1;
+
     return 0;
 }
 
