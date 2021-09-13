@@ -134,6 +134,7 @@ void Model::setSolverParameters(int isMaximisation, string modelFilename, string
 
     solver->setLPMethod(Options::getInstance()->getIntOption("lp_method"));
     solver->setFeasibilityPump(Options::getInstance()->getIntOption("feasibility_pump"));
+    solver->setSolverRandomSeed(Options::getInstance()->getIntOption("solver_random_seed"));
 
     if (!captureCuts) {
         if (Options::getInstance()->getBoolOption("first_node_only")) solver->setNodeLimit(1);

@@ -228,6 +228,14 @@ int Util::isEqual(string s, string c) {
     return !s.compare(c);
 }
 
+int Util::startsWith(string s, string start) {
+    return s.rfind(start, 0) == 0;
+}
+
+int Util::contains(vector<string> v, string s) {
+    return std::find(v.begin(), v.end(), s) != v.end();
+}
+
 ////////////////////////////
 ////////////////////////////
 ////////////////////////////

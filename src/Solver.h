@@ -104,6 +104,7 @@ class Solver {
         
         virtual void setLPMethod(int lp) {}
         virtual void setFeasibilityPump(int fp) {}
+        virtual void setSolverRandomSeed(int fp) {}
         virtual void setLPTolerance(double tolerance) {}
         virtual void disableDefaultCuts(bool disable = true) {}
         virtual void setSolverCuts(int solverCuts = -2, int clique   = -2, int cover    = -2, int disj = -2, int landp  = -2, 

@@ -37,13 +37,20 @@ class Options {
         /**
          * Instancia singleton desta classe.
          */
-         static Options* instance;
+        static Options* instance;
+
+
+
 
         vector<Option*> options;
         map<string, int> optionsMap;
 
+        vector<string> allowedWithSettingsFile;
+
         // Private methods
         void assignDefaultValues();
+
+        void readSettingsFile(string filename);
 
         void changeOptionValue(string optionName, string value);
 
@@ -70,6 +77,9 @@ class Options {
         string getOutputOptionsAsText();
         string getModifiedOptionsAsText();
 
+
+
+
         // get option values
         bool                getBoolOption       (string name);
         int                 getIntOption        (string name);
@@ -78,6 +88,8 @@ class Options {
         vector<int>         getArrayOption      (string name);
         vector<double>      getDoubleArrayOption(string name);
         vector<vector<int>> getMatrixOption     (string name);
+
+        bool                wasChanged          (string name);
 };    
 
 #endif 

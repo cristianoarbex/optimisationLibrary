@@ -87,6 +87,7 @@ class CPLEX : public Solver {
         virtual void setLPMethod(int lp);
         virtual void setLPTolerance(double tolerance);
         virtual void setFeasibilityPump(int fp);
+        virtual void setSolverRandomSeed(int fp);
         virtual void disableDefaultCuts(bool disable = true);
         virtual void setSolverCuts(int solverCuts =  0, int clique   = -2, int cover    = -2, int disj = -2, int landp  = -2, 
                                    int flowcover  = -2, int flowpath = -2, int gomory   = -2, int gub  = -2, int implbd = -2,

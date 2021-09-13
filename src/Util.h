@@ -153,6 +153,8 @@ class Util {
         static string toUpperCase(string data);
         static int isNumber(string s); 
         static int isEqual(string s, string c);
+        static int startsWith(string s, string start);
+        static int contains(vector<string> v, string s);
 
 
         // print functions

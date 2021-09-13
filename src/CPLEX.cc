@@ -405,6 +405,10 @@ void CPLEX::setFeasibilityPump(int fp) {
     Check(CPXsetintparam(env, CPXPARAM_MIP_Strategy_FPHeur, fp), env);
 }
 
+void CPLEX::setSolverRandomSeed(int fp) {
+    if (fp != 0) Check(CPXsetintparam(env, CPXPARAM_RandomSeed, fp), env);
+}
+
 
 void CPLEX::setTimeLimit(double time) {
     if (time > 0) {

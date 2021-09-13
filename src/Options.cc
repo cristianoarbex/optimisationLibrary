@@ -51,6 +51,8 @@ void Options::finalise() {
 
 void Options::assignDefaultValues() {
 
+
+
     vector<string> solverValues;
     solverValues.push_back("cplex");
     
@@ -62,9 +64,13 @@ void Options::assignDefaultValues() {
     //double dmax = std::numeric_limits<double>::max();
     double imax = std::numeric_limits<int>::max();
 
+    options.push_back(new StringOption("settings_file", "Input file with options. If not empty, only some other options such as 'output' or 'debug' are allowed.", 1, "", empty));
+    options.push_back(new StringOption("output",        "Output file where solution will be written", 1, "", empty));
+
     // Debug options
     options.push_back(new IntOption ("debug",             "Level of debug information [0-4, 0 means no debug]", 1, 2, 4, 0));
     options.push_back(new BoolOption("first_node_only",   "Solve only first node", 1, 0));
+    options.push_back(new StringOption("lp_filename",       "Name of the LP exported file if export_model = 1", 1, "bc_model.lp", empty));
     options.push_back(new BoolOption("export_model",      "If (1) exports model to lp file", 1, 0));
     options.push_back(new IntOption ("export_cplex_cuts", "Number of intermediate models with cplex cuts to export to lp file", 1, 0, imax, 0));
 
@@ -82,6 +88,7 @@ void Options::assignDefaultValues() {
     options.push_back(new IntOption   ("mip_emphasis",       "MIP emphasis (0 to 4) [Default: 0]",                                    1,     0,    4,  0));
     options.push_back(new IntOption   ("lp_method",          "Set LP method [Default: 0]",                                            1,     0,    6,  0));
     options.push_back(new IntOption   ("feasibility_pump",   "Solver feasibility pump heuristic [Default: 0]",                        1,     0,    2, -1));
+    options.push_back(new IntOption   ("solver_random_seed", "Solver random seed. If 0 do not set [Default: 0]",                      1,     0, imax,  0));
     options.push_back(new IntOption   ("probing_level",      "MIP probing lebel (-1 to 3) [Default: 1]",                              1,     0,    3, -1));
     options.push_back(new IntOption   ("node_heuristic",         "MIP node heuristic frequency (-1 to inf) [Default: 0]",             1,     0, imax, -1));
     options.push_back(new IntOption   ("branching_policy",       "From -1 to 4, choose branching policy [Default: 0]",                1,     0,    4, -1));
@@ -111,6 +118,15 @@ void Options::assignDefaultValues() {
     // HERE ADD YOUR OPTIONS
 
 
+
+    allowedWithSettingsFile.resize(0);
+    allowedWithSettingsFile.push_back("debug");
+    allowedWithSettingsFile.push_back("output");
+    allowedWithSettingsFile.push_back("lp_filename");
+    allowedWithSettingsFile.push_back("export_model");
+    allowedWithSettingsFile.push_back("export_cplex_cuts");
+
+
     for (int i = 0; i < (int)options.size(); i++) {
         optionsMap[options[i]->getName()] = i;
     }
@@ -123,6 +139,14 @@ void Options::assignDefaultValues() {
 /////////////////////////
 // GETS /////////////////
 /////////////////////////
+
+bool Options::wasChanged(string name) {
+    if (optionsMap.find(name) != optionsMap.end()) {
+        return options[optionsMap[name]]->wasChanged();
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
+    return false;
+}
+
 
 bool Options::getBoolOption(string name) {
     if (optionsMap.find(name) != optionsMap.end()) {
@@ -197,14 +221,16 @@ vector<vector<int>> Options::getMatrixOption(string name) {
 /////////////////////////
 
 void Options::parseOptions(int numOptions, char* pairs[]) {
-   
-
 
     // Empty argv
     if (numOptions == 1) {
         printHelp();
         Util::stop("");
     }
+    
+    vector<string> optionsFound;
+    vector<string> optionsValues;
+    int foundSettingsFile = 0;
 
     for (int i = 1; i < numOptions; i++) {
         string op = pairs[i];
@@ -213,24 +239,77 @@ void Options::parseOptions(int numOptions, char* pairs[]) {
         if (op.size() < 2) fail = 1;
         if (op[0] != '-' || op[1] != '-') fail = 1;
         if (fail == 0) op.erase(0, 2);
-
-        //vector<string> temp;
-        //boost::split(temp, op, boost::is_any_of("="));
-        vector<string> temp = Util::split(op, "=");
         
-        //if (boost::regex_search(op.c_str(), boost::regex("^--[^-=]*=[^=]*$"))) {
-        //    op.erase(0, 2);
-        //    vector<string> temp;
-        //    boost::split(temp, op, boost::is_any_of("="));
+        vector<string> temp = Util::split(op, "=");
+
         if (!fail && temp.size() == 2) {
-            changeOptionValue(temp[0], temp[1]);
+            if (temp[0] == "settings_file") foundSettingsFile = 1;
+            optionsFound.push_back(temp[0]);
+            optionsValues.push_back(temp[1]);
         } else {
             Util::stop("Error: Invalid option %s", op.c_str());
         }
     }
 
+    if (foundSettingsFile) {
+        for (unsigned i = 0; i < optionsFound.size(); i++) {
+            if (!Util::contains(allowedWithSettingsFile, optionsFound[i]) && optionsFound[i] != "settings_file") {
+                Util::stop("\nWhen you provide a settings_file, the only other options that can be provided via command line are:\n\n%s\n", Util::join(allowedWithSettingsFile, ", ").c_str());
+            }
+        }
+        for (unsigned i = 0; i < optionsFound.size(); i++) {
+            if (optionsFound[i] != "settings_file") {
+                changeOptionValue(optionsFound[i], optionsValues[i]);
+            } else {
+                readSettingsFile(optionsValues[i]);
+            }
+        }
+    } else {
+        for (unsigned i = 0; i < optionsFound.size(); i++) {
+            changeOptionValue(optionsFound[i], optionsValues[i]);
+        }
+    }
+
     specificChecks();
+    print();
+
 }
+
+void Options::readSettingsFile(string filename) {
+
+    vector<string> lines;
+
+    std::ifstream file(filename);
+
+    if (file.is_open()) {
+        string line;
+        while (std::getline(file, line)) {
+            lines.push_back(line);
+        }
+    } else {
+        Util::stop("\nError: Settings file %s could not be open, either because it doesn't exist or due to some other error.\n", filename.c_str());
+    }
+    file.close();
+    
+    vector<string> optionsFound;
+
+    for (unsigned l = 0; l < lines.size(); l++) {
+        if (Util::startsWith(lines[l], "#")) continue;
+        if (lines[l].empty()) continue;
+        vector<string> temp = Util::split(lines[l], " ");
+        if (temp.size() != 2) Util::stop("\nError: In settings file %s, line '%s' is invalid.\nIt must contain a valid parameter name and the value.", filename.c_str(), lines[l].c_str());
+        if (Util::contains(allowedWithSettingsFile, temp[0])) Util::stop("\nOption %s, defined in the settings file, can only be assigned via command line.", temp[0].c_str());
+        if (Util::contains(optionsFound, temp[0])) Util::stop("\nOption %s was defined more than once in the settings file.", temp[0].c_str());
+
+        optionsFound.push_back(temp[0]);
+        changeOptionValue(temp[0], temp[1]);
+            
+        //printf("Line:");
+        //for (unsigned i = 0; i < temp.size(); i++) printf(" %s", temp[i].c_str());
+        //printf("\n");
+    }
+}
+
 
 void Options::specificChecks() {
     if (Options::getInstance()->getStringOption("input").empty()) Util::stop("Error: Input file was not provided");
