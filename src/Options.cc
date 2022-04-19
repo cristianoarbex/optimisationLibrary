@@ -271,7 +271,6 @@ void Options::parseOptions(int numOptions, char* pairs[]) {
     }
 
     specificChecks();
-    print();
 
 }
 

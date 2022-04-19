@@ -153,12 +153,7 @@ vector<SolverCut> ModelCapitalBudgeting::separationAlgorithm(vector<double> sol)
 
     vector<SolverCut> cuts;
 
-    float startTime = Util::getTime();
-
-    callbackCalls++;
-    int callbackControl = std::numeric_limits<int>::max();
-
-    
+    // Finding out whether the current solution is integer or not
     int isInteger = 1;
     for (unsigned i = 0; i < sol.size(); i++) {
         if (fabs(sol[i] - round(sol[i])) > TOLERANCE) {
@@ -168,25 +163,14 @@ vector<SolverCut> ModelCapitalBudgeting::separationAlgorithm(vector<double> sol)
         }
     }
 
-    if (callbackCalls > callbackControl) printf("%04d Callback (%s):", callbackCalls, isInteger ? "integer   " : "fractional");
-
-    if (callbackCalls > callbackControl) printf(" (end)\n");
-
-    callbackTime += Util::getTime() - startTime;
-    
-    // FOR DEBUGGING PURPOSES
-    int printForDebug = 0;
-    if (cuts.size() == 0 && Options::getInstance()->getBoolOption("first_node_only") && callbackCalls > 1) printForDebug = 1;
-
 
     ///////
-    // EXEMPLO DE CORTE
+    // Cut example
     
-    // Pra achar valor de variavel
+    // Finding the value of a specific variable in the current linear relaxation
     //double ysol = sol[solver->getColIndex(y + lex(t) + "_" + lex(b))];
       
-    // Aqui procurar o corte
-
+    // Creating and adding a cut y_{tb} >= -1 as an example
     //SolverCut cut;
     //cut.setSense('G');
     //cut.addCoef(solver->getColIndex(y + lex(t) + "_" + lex(b)), 1);

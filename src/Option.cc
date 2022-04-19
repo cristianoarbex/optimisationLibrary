@@ -129,7 +129,7 @@ void DoubleOption::checkOption(string str, string optionName) {
 
 string DoubleOption::getValueAsString() {
     char buffer[30];
-    sprintf(buffer, "%.9f", value);
+    sprintf(buffer, "%g", value);
     return buffer;
 }
 
