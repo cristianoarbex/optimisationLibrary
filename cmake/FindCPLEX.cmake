@@ -23,7 +23,7 @@ if (UNIX)
     set(CPLEX_ARCH x86)
   endif ()
   if (APPLE)
-    set(CPLEX_ILOG_DIRS $ENV{HOME}/Applications/IBM/ILOG /Applications ${CPLEX_ILOG_DIRS})
+    set(CPLEX_ILOG_DIRS $ENV{HOME}/Applications/IBM/ILOG ${CPLEX_ILOG_DIRS})
     foreach (suffix "osx" "darwin9_gcc4.0")
       set(CPLEX_LIB_PATH_SUFFIXES
           ${CPLEX_LIB_PATH_SUFFIXES} lib/${CPLEX_ARCH}_${suffix}/static_pic)
@@ -67,18 +67,13 @@ if (NOT CPLEX_STUDIO_DIR)
   foreach (dir ${CPLEX_ILOG_DIRS})
     file(GLOB CPLEX_STUDIO_DIRS "${dir}/CPLEX_Studio*")
     list(SORT CPLEX_STUDIO_DIRS)
-    
-    # Cristiano: I added this sometime in the past because cmake was taking the first
-    # CPLEX installation in alphabetical order. I had 12.7 and 12.8. I now tested 12.10
-    # and so commented the reverse list because I do want the first in alphabetical order
-    # I currently have installed 12.10 and 12.8 in folders:
-    #   CPLEX_Studio1210  CPLEX_Studio128
-    #
     #list(REVERSE CPLEX_STUDIO_DIRS)
-    
+    message("Found studio dirs: ${CPLEX_STUDIO_DIRS}")
     if (CPLEX_STUDIO_DIRS)
       list(GET CPLEX_STUDIO_DIRS 0 CPLEX_STUDIO_DIR_)
+      string(REGEX MATCH "[0-9][0-9][0-9][0-9]" CPXVERSION ${CPLEX_STUDIO_DIR_})
       message(STATUS "Found CPLEX Studio: ${CPLEX_STUDIO_DIR_}")
+      message(STATUS "Detected CPLEX version ${CPXVERSION}")
       break ()
     endif ()
   endforeach ()
@@ -89,11 +84,21 @@ if (NOT CPLEX_STUDIO_DIR)
     "Path to the CPLEX Studio directory")
 endif ()
 
+# On windows, CPLEX 12.10 brought a big semplification in terms of libraries:
+# only one version is used for VS2015, 2017 and 2019 due to the maintained 
+# ABI compatibility. Therefore, override the directory
+if(MSVC AND (NOT "${CPXVERSION}" STREQUAL ""))
+  if(NOT(${CPXVERSION} LESS 1210))
+    set(CPLEX_LIB_PATH_SUFFIXES lib/${CPLEX_ARCH}_windows_msvc14/stat_mda)
+    set(CPLEX_LIB_PATH_SUFFIXES_DEBUG lib/${CPLEX_ARCH}_windows_msvc14/stat_mdd)
+  endif()
+endif()
 find_package(Threads)
 
 # ----------------------------------------------------------------------------
 # CPLEX
-set(CPLEX_DIR ${CPLEX_STUDIO_DIR}/cplex)
+
+set(CPLEX_DIR ${CPLEX_STUDIO_DIR_}/cplex)
 
 # Find the CPLEX include directory.
 find_path(CPLEX_INCLUDE_DIR ilcplex/cplex.h PATHS ${CPLEX_DIR}/include)
@@ -124,9 +129,6 @@ elseif (NOT CPLEX_LIBRARY)
   message("CPLEX_LIBRARY " ${CPLEX_LIBRARY})
   set(CPLEX_LIBRARY ${CPLEX_LIB} CACHE FILEPATH "Path to the CPLEX library")
   find_win_cplex_library(CPLEX_LIB "${CPLEX_LIB_PATH_SUFFIXES_DEBUG}")
-    
-	
-	
   set(CPLEX_LIBRARY_DEBUG ${CPLEX_LIB} CACHE
     FILEPATH "Path to the debug CPLEX library")
 	message("CPLEX_LIBRARY " ${CPLEX_LIBRARY})
@@ -145,7 +147,7 @@ find_package_handle_standard_args(
 mark_as_advanced(CPLEX_LIBRARY CPLEX_LIBRARY_DEBUG CPLEX_INCLUDE_DIR)
 
 if (CPLEX_FOUND AND NOT TARGET cplex-library)
-  set(CPLEX_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT})
+  set(CPLEX_LINK_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
   check_library_exists(m floor "" HAVE_LIBM)
   if (HAVE_LIBM)
     set(CPLEX_LINK_LIBRARIES ${CPLEX_LINK_LIBRARIES} m)
@@ -173,8 +175,6 @@ macro(find_cplex_library var name paths)
 endmacro()
 
 set(CPLEX_CONCERT_DIR ${CPLEX_STUDIO_DIR}/concert)
-
-
 
 # Find the Concert include directory.
 find_path(CPLEX_CONCERT_INCLUDE_DIR ilconcert/ilosys.h

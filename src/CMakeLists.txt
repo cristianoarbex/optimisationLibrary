@@ -1,5 +1,6 @@
-include_directories(${OPTLIB_SOURCE_DIR}/src)
-link_directories(${OPTLIB_BINARY_DIR}/src)
+#include_directories(${OPTLIB_SOURCE_DIR}/src)
+#link_directories(${OPTLIB_BINARY_DIR}/src)
+find_package(CPLEX)
 
 
 # Uncomment below if you plan to use Boost. No need to uncomment 
@@ -8,14 +9,6 @@ link_directories(${OPTLIB_BINARY_DIR}/src)
 #SET (Boost_USE_STATIC_RUNTIME ON)
 #find_package(Boost COMPONENTS)
 #find_package(Boost COMPONENTS regex REQUIRED)
-
-#find_library(SQLITE_LIBRARY_RELEASE sqlite3 VARIANT static)
-
-find_package(CPLEX)
-if (CPLEX_FOUND)
-else ()
-endif ()
-
 
 
 add_executable(${OPTLIB_COMPILED} 
@@ -34,15 +27,32 @@ add_executable(${OPTLIB_COMPILED}
       ModelCapitalBudgeting.h ModelCapitalBudgeting.cc
       )
 
-target_link_libraries(${OPTLIB_COMPILED} m)
-#target_link_libraries(${OPTLIB_COMPILED} ${SQLITE_LIBRARY_RELEASE})
-#target_link_libraries(${OPTLIB_COMPILED} sqlite3)
-target_link_libraries(${OPTLIB_COMPILED} pthread)
+# Added private defininition of throw_exception to Util.h
+target_compile_definitions(${OPTLIB_COMPILED} PRIVATE BOOST_NO_EXCEPTIONS)
+
+if(MSVC)
+    target_compile_definitions(${OPTLIB_COMPILED} PRIVATE _DLL) # apparently required for DLL CRT 
+	target_compile_definitions(${OPTLIB_COMPILED} PRIVATE IL_STD) 
+endif()
+
+target_link_libraries(${OPTLIB_COMPILED} cplex-library)
+#target_link_libraries(${OPTLIB_COMPILED} cplex-concert)
+target_link_libraries(${OPTLIB_COMPILED} ilocplex)
+
+if(NOT MSVC)
+	target_link_libraries(${OPTLIB_COMPILED} pthread)
+	target_link_libraries(${OPTLIB_COMPILED} dl)
+endif()
+
+
+if(DEFINED OPTLIB_EXTERNAL_BUILD)
+  add_custom_command(TARGET ${OPTLIB_COMPILED}  
+                     POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${OPTLIB_COMPILED}> ${OPTLIB_DESTINATIONDIR})	 
+endif()
+
+#target_link_libraries(${OPTLIB_COMPILED} m)
 # Uncomment below if you plan to use Boost. No need to uncomment 
 #   regex unless you also plan to use boost regex.
 #target_link_libraries(${OPTLIB_COMPILED} boost_regex)
 #target_link_libraries(${OPTLIB_COMPILED} ${Boost_LIBRARIES})
-target_link_libraries(${OPTLIB_COMPILED} cplex-library)
-target_link_libraries(${OPTLIB_COMPILED} cplex-concert)
-target_link_libraries(${OPTLIB_COMPILED} ilocplex)
-target_link_libraries(${OPTLIB_COMPILED} dl)

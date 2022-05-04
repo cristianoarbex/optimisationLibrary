@@ -1,32 +1,34 @@
 cmake_minimum_required(VERSION 2.8)
-
-# Use a static runtime for MSVC build (http://www.vtk.org/Wiki/CMake_FAQ).
-set(CMAKE_USER_MAKE_RULES_OVERRIDE
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/c_flag_overrides.cmake)
-set(CMAKE_USER_MAKE_RULES_OVERRIDE_CXX
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/cxx_flag_overrides.cmake)
-
 project(OPTLIB)
 
-#set(OPTLIB_VERSION_MAJOR 0)
-#set(OPTLIB_VERSION_MINOR 1)
-#set(PACKAGE_VERSION ${OPTLIB_VERSION_MAJOR}.${OPTLIB_VERSION_MINOR})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-#set(OPTLIB_COMPILED ssd${OPTLIB_VERSION_MAJOR}${OPTLIB_VERSION_MINOR})
-set(OPTLIB_COMPILED optLib)
+
+
+if(DEFINED SSD_COMPILED)
+  set(OPTLIB_EXTERNAL_BUILD 1)
+else()
+  set(OPTLIB_COMPILED optlib)
+endif()
 
 # Static so I can copy the executable to another version
 # Check link for other possible options:
 #
 # http://stackoverflow.com/questions/13636513/linking-libstdc-statically-any-gotchas
 #
-set(CMAKE_CXX_FLAGS "-g -Wall -O2 -static-libstdc++ -static-libgcc -std=c++11")
-#set(CMAKE_CXX_FLAGS "-g -Wall -O2 -std=c++11")
+if(MSVC)
+	set(CMAKE_CXX_FLAGS "-O2 -EHsc")
+	# get rid of useless warnings
+	add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(CLANG TRUE)
+  message("CLANG ")
+  set(CMAKE_CXX_FLAGS "-stdlib=libc++ -std=c++11")
+else()
+	set(CMAKE_CXX_FLAGS "-g -Wall -O2 -static-libstdc++ -static-libgcc -std=c++11")
+endif()
 
-# Output file is located in build folder
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-
+# Output file is located in the bin directory under the build folder
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(src)
