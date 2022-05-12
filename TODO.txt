@@ -7,3 +7,6 @@
  - Add user and lazy cuts before optimisation?
  - To incumbent callback add Check(CPXsetintparam(env, CPX_PARAM_MIPCBREDLP, CPX_OFF), env);
 
+
+ - Add TSP
+ - Add documentation
