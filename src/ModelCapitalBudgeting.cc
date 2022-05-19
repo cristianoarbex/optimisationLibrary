@@ -104,7 +104,15 @@ void ModelCapitalBudgeting::createModel(const Data* data) {
         elements[i] = dataCB->getInitialInvestment(i);
     }
     solver->addRow(colNames, elements, dataCB->getMaxInvestment(), 'L', "constraint");
-
+    
+    // x_2 + x_3 <= 1 (Restricoes podem ser 'G', 'E' ou 'L'
+    //colNames.resize(2);
+    //elements.resize(2);
+    //colNames[0] = x + lex(2);
+    //colNames[1] = x + lex(3);
+    //elements[0] = 1;
+    //elements[1] = 1;
+    //solver->addRow(colNames, elements, 1, 'L', "eou2ou3");
     
     //x1 + 5*x2 <= 3
     //colNames.resize(2);
