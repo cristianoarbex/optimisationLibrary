@@ -150,3 +150,9 @@ The following steps must be followed:
 4. Open optlib debug properties. In *Debugging*, fill *Command Arguments* with the options you want to send by parameters and click *Ok*.
 
 5. Click in *Local Windows Debugger*.
+
+
+### TODO list
+
+1. Adapt this documentation for the differences between compiling in Linux and Windows.
+2. Make sure the library works with CPLEX 20+ in both Linux and Windows.
