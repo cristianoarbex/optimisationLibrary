@@ -10,6 +10,8 @@
 #include "Options.h"
 #include "DataCapitalBudgeting.h"
 #include "ModelCapitalBudgeting.h"
+#include "DataMotivatingProblem.h"
+#include "ModelMotivatingProblem.h"
 
 
 Execute::Execute() {
@@ -30,6 +32,9 @@ void Execute::execute() {
     if (Options::getInstance()->getStringOption("model").compare("toy") == 0) {
         data  = new DataCapitalBudgeting();
         model = new ModelCapitalBudgeting();
+    } else if (Options::getInstance()->getStringOption("model").compare("motivating") == 0) {
+        data  = new DataMotivatingProblem();
+        model = new ModelMotivatingProblem();
     } else {
         data  = new Data();
         model = new Model();

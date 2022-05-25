@@ -133,6 +133,10 @@ bin/Release/optlib.exe --input=aaa  --debug=1
 bin/Release/optlib.exe --input=aaa --export_model=1
 ```
 
+```sh
+bin/Release/optlib.exe --input=aaa --model=motivating
+```
+
 > **WARNING**: The input parameter is mandatory
 
 ### How to debug

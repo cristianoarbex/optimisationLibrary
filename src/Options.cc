@@ -58,6 +58,7 @@ void Options::assignDefaultValues() {
     
     vector<string> modelValues;
     modelValues.push_back("toy");
+    modelValues.push_back("motivating");
     
     vector<string> empty;
    

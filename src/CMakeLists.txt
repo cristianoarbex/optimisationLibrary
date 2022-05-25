@@ -25,6 +25,9 @@ add_executable(${OPTLIB_COMPILED}
       
       DataCapitalBudgeting.h  DataCapitalBudgeting.cc
       ModelCapitalBudgeting.h ModelCapitalBudgeting.cc
+
+      DataMotivatingProblem.h  DataMotivatingProblem.cc
+      ModelMotivatingProblem.h ModelMotivatingProblem.cc
       )
 
 # Added private defininition of throw_exception to Util.h

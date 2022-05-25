@@ -76,6 +76,38 @@ This is the abstraction of the [DataCapitalBudgeting class](#datacapitalbudgetin
   * int getInitialInvestment(int i): gets the initial investment.
   * int getFutureValue(int i): gets the future value of the variable. 
 
+  #### DataMotivatingProblem.h
+
+This is the abstraction of the [DataMotivatingProblem class](#datamotivatingproblem.cc).
+
+* Dependencies
+  * [Util.h](#util.h)
+  * [Data.h](#data.h)
+
+* Properties
+  * int numVariables: the number of decision variables
+  * vector<int> objectiveCoefficients: the array of coefficient values of each variable of the objective function
+  * vector<int> firstConstraintCoefficients: the array of coefficient values of each variable of the objective function of the first constraint
+  * vector<int> secondConstraintCoefficients: the array of coefficient values of each variable of the objective function of the second constraint
+  * vector<int> thirdConstraintCoefficients: the array of coefficient values of each variable of the objective function of the third constraint
+  * int firstConstraintMaxValue: the maximum value of the first constraint
+  * int secondConstraintMaxValue: the maximum value of the second constraint
+  * int thirdConstraintMaxValue: the maximum value of the third constraint
+
+* Public functions
+  * DataMotivatingProblem(): constructor
+  * ~DataMotivatingProblem(): destructor
+  * void readData(): sets the data and parameters of the optimization problem
+  * void print(): prints the data of the optimization problem
+  * int getNumVariables(): gets the number of decision variables
+  * int getObjectiveCoefficients(): gets the array of coefficient values of the objective function
+  * int getFirstConstraintCoefficients(int i): gets the array of coefficient values of the first constraint
+  * int getSecondConstraintCoefficients(int i): gets the array of coefficient values of the second constraint
+  * int getThirdConstraintCoefficients(int i): gets the array of coefficient values of the third constraint
+  * int getFirstConstraintMaxValue(): gets the maximum value of the first constraint
+  * int getSecondConstraintMaxValue(): gets the maximum value of the second constraint
+  * int getThirdConstraintMaxValue(): gets the maximum value of the third constraint
+
 #### Execute.h
 
 This is the abstraction of the [Execute class](#execute.cc).
@@ -208,6 +240,31 @@ This is the abstraction of the [ModelCapitalBudgeting class](#modelcapitalbudget
   * ModelCapitalBudgeting(): constructor
   * ~ModelCapitalBudgeting(): destructor
   * void execute(const Data *data): executes the process of solving the Capital Budgeting problem
+
+#### ModelMotivatingProblem.h
+
+This is the abstraction of the [ModelMotivatingProblem class](#modelmotivatingproblem.cc).
+
+* Dependencies
+  * [Model.h](#model.h)
+  * [Solution.h](#solution.h)
+
+* Properties
+  * string x: the string that describes the solution
+  * int V: the solution value
+  * vector<double> sol_x: the value of the variables
+  
+* Private functions
+  * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
+  * void readSolution(const Data* data): gets the solution
+  * void assignWarmStart(const Data* data)
+  * void createModel(const Data* data): creates a model formatted to the solver based on the data 
+  * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+
+* Public functions
+  * ModelCapitalBudgeting(): constructor
+  * ~ModelCapitalBudgeting(): destructor
+  * void execute(const Data *data): executes the process of solving the motivating problem
 
 #### Option.h
 
@@ -477,6 +534,72 @@ This class is responsible to create and manage a data object for the Capital Bud
   * Returns:
     * The future value of a variable
 
+#### DataMotivatingProblem.cc
+
+This class is responsible to create and manage a data object for the motivating problem.
+
+* Dependencies
+  * [DataMotivatingProblem.h](#datamotivatingproblem.h)
+  * [Options.h](#options.h)
+
+* DataMotivatingProblem()
+  * Constructor
+  * Actions:
+    * Sets numVariables to 0 (zero)
+    * Sets firstConstraintMaxValue to 0 (zero)
+    * Sets secondConstraintMaxValue to 0 (zero)
+    * Sets thirdConstraintMaxValue to 0 (zero)
+* ~DataMotivatingProblem() 
+  * Destructor
+* void readData()
+  * Actions:
+    * Sets the number of variables of the motivating problem
+    * Sets the maximum values of the constraints
+    * Sets the array of coefficients of the motivating problem
+* void print()
+  * Actions:
+    * Prints the number of variables and the model, if the *debug* option is activated
+* int getNumVariables()
+  * Returns:
+    * The number of decision variables
+* int getObjectiveCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getFirstConstraintCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getSecondConstraintCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getThirdConstraintCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getFirstConstraintMaxValue()
+  * Returns:
+    * The maximum value of the constraint of a variable
+* int getSecondConstraintMaxValue()
+  * Returns:
+    * The maximum value of the constraint of a variable
+* int getThirdConstraintMaxValue()
+  * Returns:
+    * The maximum value of the constraint of a variable
+
 #### Execute.cc
 
 This class is responsible to execute the main process to solve an optimization problem.
@@ -698,6 +821,67 @@ This class is responsible to create and manage a model object for the Capital Bu
 * void execute(const Data *data)
   * Parameters:
     * data: the object with the parameters of the Capital Budgeting problem.
+  * Actions:
+    * Calls the function [getTme()](#util.h) and set the start time
+    * Calls the function [printSolverName()](#solver.h)
+    * Calls the function createModel(data)
+    * Calls the function reserveSolutionSpace(data)
+    * Calls the function assignWarmStart(data)
+    * Calls the function setSolverParameters(1)
+    * Calls the function [addInfoCallback(this)](#solver.h)
+    * Calls the function solve(data)
+    * Calls the function [getTme()](#util.h) and calculate the total time
+    * Calls the function printSolutionVariables()
+
+#### ModelMotivatingProblem.cc
+
+This class is responsible to create and manage a model object for the motivating problem.
+
+* Dependencies
+  * [ModelMotivatingProblem.h](#modelmotivatingproblem.h)
+  * [Options.h](#options.h)
+  * [DataMotivatingProblem.h](#datamotivatingproblem.h)
+  
+* void reserveSolutionSpace(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
+  * Actions:
+    * Resizes the sol_x array
+* void readSolution(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
+  * Actions:
+    * Calls the function [getNodeCount()](#solver.h)
+    * Calls the function [resetSolution()](#solution.h)
+    * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
+    * If the solution does't exist, prints it
+    * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x array
+* void createModel(const Data* data): create a model formatted to the solver
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
+  * Actions:
+    * Creates a [DataMotivatingProblem](#datamotivatingproblem.h) instance
+    * Calls the function [getNumVariables](#datamotivatingproblem.h)
+    * Calls the function [changeObjectiveSense()](#solver.h)
+    * Sends the decision variables to the solver calling [addVariable()](#solver.h)
+    * Sends the constraints to the solver
+* void printSolutionVariables(int digits = 5, int decimals = 2)
+  * Parameters:
+    * digits: maximum number of digits of the value of the solution
+    * decimals: maximum number of decimal places of the value of the solution
+  * Actions:
+    * Prints the value of each decision variable of the solution, if the *debug* option is activated
+
+* ModelMotivatingProblem()
+  * Constructor
+  * Actions:
+    * Sets V to 0 (zero)
+    * Sets x to "x" 
+* ~ModelMotivatingProblem()
+  * Destructor
+* void execute(const Data *data)
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
   * Actions:
     * Calls the function [getTme()](#util.h) and set the start time
     * Calls the function [printSolverName()](#solver.h)
