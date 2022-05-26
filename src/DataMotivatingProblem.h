@@ -1,6 +1,6 @@
 
-#ifndef DATAMOTIVATIONPROBLEM_H
-#define DATAMOTIVATIONPROBLEM_H
+#ifndef DATAMOTIVATINGPROBLEM_H
+#define DATAMOTIVATINGPROBLEM_H
 
 #include "Util.h"
 #include "Data.h"

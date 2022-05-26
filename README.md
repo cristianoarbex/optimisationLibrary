@@ -160,3 +160,4 @@ The following steps must be followed:
 
 1. Adapt this documentation for the differences between compiling in Linux and Windows.
 2. Make sure the library works with CPLEX 20+ in both Linux and Windows.
+3. Make an user guide to add models.

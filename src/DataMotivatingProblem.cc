@@ -91,21 +91,21 @@ void DataMotivatingProblem::print() {
 }
 
 int DataMotivatingProblem::getFirstConstraintCoefficients(int i) const {
-    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getInitialInvestment");
+    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getFirstConstraintCoefficients");
     return firstConstraintCoefficients[i];
 }
 
 int DataMotivatingProblem::getSecondConstraintCoefficients(int i) const {
-    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getInitialInvestment");
+    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getSecondConstraintCoefficients");
     return secondConstraintCoefficients[i];
 }
 
 int DataMotivatingProblem::getThirdConstraintCoefficients(int i) const {
-    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getInitialInvestment");
+    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getThirdConstraintCoefficients");
     return thirdConstraintCoefficients[i];
 }
 
 int DataMotivatingProblem::getObjectiveCoefficients(int i) const {
-    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getFutureValue");
+    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getObjectiveCoefficients");
     return objectiveCoefficients[i];
 }

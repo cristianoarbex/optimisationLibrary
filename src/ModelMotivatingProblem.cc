@@ -67,13 +67,13 @@ void ModelMotivatingProblem::readSolution(const Data* data) {
 
 void ModelMotivatingProblem::createModel(const Data* data) {
     
-    const DataMotivatingProblem* dataCB = dynamic_cast<const DataMotivatingProblem*>(data);
-    V = dataCB->getNumVariables();
+    const DataMotivatingProblem* dataMP = dynamic_cast<const DataMotivatingProblem*>(data);
+    V = dataMP->getNumVariables();
     solver->changeObjectiveSense(1);
 
     // objective function
     for (int i = 0; i < V; i++)
-        solver->addVariable(0, INFINITO_DOUBLE, dataCB->getObjectiveCoefficients(i), x + lex(i));
+        solver->addVariable(0, INFINITO_DOUBLE, dataMP->getObjectiveCoefficients(i), x + lex(i));
 
     vector<string> colNames;
     vector<double> elements;
@@ -84,25 +84,25 @@ void ModelMotivatingProblem::createModel(const Data* data) {
     // First constraint
     for (int i = 0; i < V; i++) {
         colNames[i] = x + lex(i);
-        elements[i] = dataCB->getFirstConstraintCoefficients(i);
+        elements[i] = dataMP->getFirstConstraintCoefficients(i);
     }
-    solver->addRow(colNames, elements, dataCB->getFirstConstraintMaxValue(), 'L', "constraint");
+    solver->addRow(colNames, elements, dataMP->getFirstConstraintMaxValue(), 'L', "constraint");
     
 
     // Second constraint
     for (int i = 0; i < V; i++) {
         colNames[i] = x + lex(i);
-        elements[i] = dataCB->getSecondConstraintCoefficients(i);
+        elements[i] = dataMP->getSecondConstraintCoefficients(i);
     }
-    solver->addRow(colNames, elements, dataCB->getSecondConstraintMaxValue(), 'L', "constraint");
+    solver->addRow(colNames, elements, dataMP->getSecondConstraintMaxValue(), 'L', "constraint");
 
 
     // Third constraint
     for (int i = 0; i < V; i++) {
         colNames[i] = x + lex(i);
-        elements[i] = dataCB->getThirdConstraintCoefficients(i);
+        elements[i] = dataMP->getThirdConstraintCoefficients(i);
     }
-    solver->addRow(colNames, elements, dataCB->getThirdConstraintMaxValue(), 'L', "constraint");
+    solver->addRow(colNames, elements, dataMP->getThirdConstraintMaxValue(), 'L', "constraint");
 }
 
 
