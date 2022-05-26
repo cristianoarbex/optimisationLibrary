@@ -12,7 +12,8 @@
 #include "ModelCapitalBudgeting.h"
 #include "DataMotivatingProblem.h"
 #include "ModelMotivatingProblem.h"
-
+#include "DataKnapsackProblem.h"
+#include "ModelKnapsackProblem.h"
 
 Execute::Execute() {
     totalTime = 0;
@@ -35,6 +36,9 @@ void Execute::execute() {
     } else if (Options::getInstance()->getStringOption("model").compare("motivating") == 0) {
         data  = new DataMotivatingProblem();
         model = new ModelMotivatingProblem();
+    } else if (Options::getInstance()->getStringOption("model").compare("knapsackProblem") == 0) {
+        data  = new DataKnapsackProblem();
+        model = new ModelKnapsackProblem();
     } else {
         data  = new Data();
         model = new Model();

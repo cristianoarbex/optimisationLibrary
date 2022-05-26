@@ -76,6 +76,30 @@ This is the abstraction of the [DataCapitalBudgeting class](#datacapitalbudgetin
   * int getInitialInvestment(int i): gets the initial investment.
   * int getFutureValue(int i): gets the future value of the variable. 
 
+  #### DataKnapsackProblem.h
+
+This is the abstraction of the [DataKnapsackProblem class](#dataknapsackproblem.cc).
+
+* Dependencies
+  * [Util.h](#util.h)
+  * [Data.h](#data.h)
+
+* Properties
+  * int numVariables: the number of decision variables
+  * vector<double> returnValues: the array of return value of each item
+  * vector<double> costs: the array with the cost of each item
+  * double capacity: the capacity
+
+* Public functions
+  * DataKnapsackProblem(): constructor
+  * ~DataKnapsackProblem(): destructor
+  * void readData(): sets the data and parameters of the optimization problem
+  * void print(): prints the data of the optimization problem
+  * int getNumVariables(): gets the number of decision variables
+  * double getCapacity(): gets the capacity
+  * double getReturnValues(int i): gets the return value.
+  * double getCost(int i): gets the cost. 
+
   #### DataMotivatingProblem.h
 
 This is the abstraction of the [DataMotivatingProblem class](#datamotivatingproblem.cc).
@@ -240,6 +264,31 @@ This is the abstraction of the [ModelCapitalBudgeting class](#modelcapitalbudget
   * ModelCapitalBudgeting(): constructor
   * ~ModelCapitalBudgeting(): destructor
   * void execute(const Data *data): executes the process of solving the Capital Budgeting problem
+
+  #### ModelKnapsackProblem.h
+
+This is the abstraction of the [ModelKnapsackProblem class](#modelknapsackproblem.cc).
+
+* Dependencies
+  * [Model.h](#model.h)
+  * [Solution.h](#solution.h)
+
+* Properties
+  * string x: the string that describes the solution
+  * int V: the solution value
+  * vector<double> sol_x: the value of the variables
+  
+* Private functions
+  * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
+  * void readSolution(const Data* data): gets the solution
+  * void assignWarmStart(const Data* data)
+  * void createModel(const Data* data): creates a model formatted to the solver based on the data 
+  * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+
+* Public functions
+  * ModelKnapsackProblem(): constructor
+  * ~ModelKnapsackProblem(): destructor
+  * void execute(const Data *data): executes the process of solving the knapsack problem
 
 #### ModelMotivatingProblem.h
 
@@ -534,6 +583,51 @@ This class is responsible to create and manage a data object for the Capital Bud
   * Returns:
     * The future value of a variable
 
+#### DataKnapsackProblem.cc
+
+This class is responsible to create and manage a data object for the Knapsack Problem.
+
+* Dependencies
+  * [DataKnapsackProblem.h](#dataknapsackproblem.h)
+  * [Options.h](#options.h)
+
+* DataKnapsackProblem()
+  * Constructor
+  * Actions:
+    * Sets numVariables to 0 (zero)
+    * Sets capacity to 0 (zero)
+* ~DataKnapsackProblem() 
+  * Destructor
+* void readData()
+  * Actions:
+    * Sets the number of variables of the Knapsack problem
+    * Sets the capacity of the Knapsack problem
+    * Sets the array of return values of the Knapsack problem
+    * Sets the array of costs of the Knapsack problem
+* void print()
+  * Actions:
+    * Prints the number of variables, the capacity and the list of return values and costs, if the *debug* option is activated
+* int getNumVariables()
+  * Returns:
+    * The number of decision variables
+* double getCapacity()
+  * Returns:
+    * The capacity
+* int getReturnValue(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The return value of a variable
+* int getCost(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The cost of a variable
+
 #### DataMotivatingProblem.cc
 
 This class is responsible to create and manage a data object for the motivating problem.
@@ -774,7 +868,7 @@ This class is responsible to create and manage a default model object.
 
 #### ModelCapitalBudgeting.cc
 
-This class is responsible to create and manage a model object for the Capital Budgeting problem..
+This class is responsible to create and manage a model object for the Capital Budgeting problem.
 
 * Dependencies
   * [ModelCapitalBudgeting.h](#modelcapitalbudgeting.h)
@@ -821,6 +915,67 @@ This class is responsible to create and manage a model object for the Capital Bu
 * void execute(const Data *data)
   * Parameters:
     * data: the object with the parameters of the Capital Budgeting problem.
+  * Actions:
+    * Calls the function [getTme()](#util.h) and set the start time
+    * Calls the function [printSolverName()](#solver.h)
+    * Calls the function createModel(data)
+    * Calls the function reserveSolutionSpace(data)
+    * Calls the function assignWarmStart(data)
+    * Calls the function setSolverParameters(1)
+    * Calls the function [addInfoCallback(this)](#solver.h)
+    * Calls the function solve(data)
+    * Calls the function [getTme()](#util.h) and calculate the total time
+    * Calls the function printSolutionVariables()
+
+#### ModelKnapsackProblem.cc
+
+This class is responsible to create and manage a model object for the Knapsack Problem.
+
+* Dependencies
+  * [ModelKnapsackProblem.h](#modelknapsackproblem.h)
+  * [Options.h](#options.h)
+  * [DataKnapsackProblem.h](#dataknapsackproblem.h)
+  
+* void reserveSolutionSpace(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
+  * Actions:
+    * Resizes the sol_x array
+* void readSolution(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
+  * Actions:
+    * Calls the function [getNodeCount()](#solver.h)
+    * Calls the function [resetSolution()](#solution.h)
+    * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
+    * If the solution does't exist, prints it
+    * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x array
+* void createModel(const Data* data): create a model formatted to the solver
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
+  * Actions:
+    * Creates a [DataKnapsackProblem](#dataknapsackproblem.h) instance
+    * Calls the function [getNumVariables](#dataknapsackproblem.h)
+    * Calls the function [changeObjectiveSense()](#solver.h)
+    * Sends the decision variables to the solver calling [addBinaryVariable()](#solver.h)
+    * Sends the constraints to the solver
+* void printSolutionVariables(int digits = 5, int decimals = 2)
+  * Parameters:
+    * digits: maximum number of digits of the value of the solution
+    * decimals: maximum number of decimal places of the value of the solution
+  * Actions:
+    * Prints the value of each decision variable of the solution, if the *debug* option is activated
+
+* ModelKnapsackProblem()
+  * Constructor
+  * Actions:
+    * Sets V to 0 (zero)
+    * Sets x to "x" 
+* ~ModelKnapsackProblem()
+  * Destructor
+* void execute(const Data *data)
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
   * Actions:
     * Calls the function [getTme()](#util.h) and set the start time
     * Calls the function [printSolverName()](#solver.h)
