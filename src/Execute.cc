@@ -14,6 +14,8 @@
 #include "ModelMotivatingProblem.h"
 #include "DataKnapsackProblem.h"
 #include "ModelKnapsackProblem.h"
+#include "DataAssignmentProblem.h"
+#include "ModelAssignmentProblem.h"
 
 Execute::Execute() {
     totalTime = 0;
@@ -39,6 +41,9 @@ void Execute::execute() {
     } else if (Options::getInstance()->getStringOption("model").compare("knapsackProblem") == 0) {
         data  = new DataKnapsackProblem();
         model = new ModelKnapsackProblem();
+    } else if (Options::getInstance()->getStringOption("model").compare("assignmentProblem") == 0) {
+        data  = new DataAssignmentProblem();
+        model = new ModelAssignmentProblem();
     } else {
         data  = new Data();
         model = new Model();

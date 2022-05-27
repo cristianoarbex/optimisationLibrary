@@ -45,7 +45,7 @@ void DataKnapsackProblem::readData() {
 void DataKnapsackProblem::print() {
     if (debug) {
         printf("Num variables : %2d\n", numVariables);
-        printf("Capacity: %2d\n", capacity);
+        printf("Capacity: %f\n", capacity);
         for (int i = 0; i < numVariables; i++) {
             printf("Item %2d: Cost %f, Return value %f\n", i, costs[i], returnValues[i]);
         }

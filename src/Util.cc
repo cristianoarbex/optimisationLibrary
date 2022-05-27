@@ -693,3 +693,48 @@ std::vector<double> Util::randomN(int N, bool allowNeg, double maxNeg) {
 /////////////////////////
 
 
+////////////////////////////
+////////////////////////////
+////////////////////////////
+// MATRIX FUNCTIONS ////////
+////////////////////////////
+
+vector<vector<int>> Util::transposeIntMatrix(const vector<vector<int> > &original, int xSize, int ySize) {
+    vector<vector<int>> transposed;
+    transposed.resize(xSize, vector<int>(ySize));
+    for (int i = 0; i < xSize; i++) {
+        for (int j = 0; j < ySize; j++) {
+            transposed[j][i] = original[i][j];
+        }
+    }
+    return transposed;
+}
+
+vector<vector<double>> Util::transposeDoubleMatrix(const vector<vector<double> > &original, int xSize, int ySize) {
+    vector<vector<double>> transposed;
+    transposed.resize(xSize, vector<double>(ySize));
+    for (int i = 0; i < xSize; i++) {
+        for (int j = 0; j < ySize; j++) {
+            transposed[j][i] = original[i][j];
+        }
+    }
+    return transposed;
+}
+
+vector<vector<string>> Util::transposeStringMatrix(const vector<vector<string> > &original, int xSize, int ySize) {
+    vector<vector<string>> transposed;
+    transposed.resize(xSize, vector<string>(ySize));
+    for (int i = 0; i < xSize; i++) {
+        for (int j = 0; j < ySize; j++) {
+            transposed[j][i] = original[i][j];
+        }
+    }
+    return transposed;
+}
+
+
+
+/////////////////////////
+/////////////////////////
+/////////////////////////
+/////////////////////////

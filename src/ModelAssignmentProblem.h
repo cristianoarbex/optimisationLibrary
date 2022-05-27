@@ -1,19 +1,21 @@
 
-#ifndef MODELKNAPSACKPROBLEM_H
-#define MODELKNAPSACKPROBLEM_H
+#ifndef MODELASSIGNMENTPROBLEM_H
+#define MODELASSIGNMENTPROBLEM_H
 
 #include "Model.h"
 #include "Solution.h"
+#include "Util.h"
 
-class ModelKnapsackProblem : public Model {
+class ModelAssignmentProblem : public Model {
 
     private:
+    
         // Variable names
         string x;
         
         // Solution values
         int V;
-        vector<int> sol_x;
+        vector<vector<int>> sol_x;
 
         virtual void reserveSolutionSpace(const Data* data);
         virtual void readSolution        (const Data* data);
@@ -24,9 +26,9 @@ class ModelKnapsackProblem : public Model {
         
     public:
         
-        ModelKnapsackProblem();
+        ModelAssignmentProblem();
 
-        virtual ~ModelKnapsackProblem();
+        virtual ~ModelAssignmentProblem();
 
         virtual void execute(const Data *data);
 

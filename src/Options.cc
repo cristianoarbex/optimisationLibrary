@@ -59,7 +59,8 @@ void Options::assignDefaultValues() {
     vector<string> modelValues;
     modelValues.push_back("toy");
     modelValues.push_back("motivating");
-    
+    modelValues.push_back("knapsackProblem");
+    modelValues.push_back("assignmentProblem");
     vector<string> empty;
    
     //double dmax = std::numeric_limits<double>::max();
