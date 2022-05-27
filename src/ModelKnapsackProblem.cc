@@ -36,7 +36,7 @@ void ModelKnapsackProblem::printSolutionVariables(int digits, int decimals) {
     if (debug) {
         printf("\nSolution: \n");
         for (int i = 0; i < V; i++) {
-            printf("  x%d = %d\n", i, sol_x[i]);
+            printf("  x%d = %.0f\n", i, sol_x[i]);
     
         }
     }
@@ -77,8 +77,6 @@ void ModelKnapsackProblem::createModel(const Data* data) {
 
     colNames.resize(V);
     elements.resize(V);
-
-    double totalCost = 0;
 
     for (int i = 0; i < V; i++) {
         colNames[i] = x + lex(i);

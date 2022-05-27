@@ -15,7 +15,7 @@ class ModelAssignmentProblem : public Model {
         
         // Solution values
         int V;
-        vector<vector<int>> sol_x;
+        vector<vector<double>> sol_x;
 
         virtual void reserveSolutionSpace(const Data* data);
         virtual void readSolution        (const Data* data);

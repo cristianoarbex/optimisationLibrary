@@ -40,7 +40,7 @@ void ModelAssignmentProblem::printSolutionVariables(int digits, int decimals) {
         for (int i = 0; i < V; i++) {
             printf("X%dj", i);
             for (int j = 0; j < V; j++) {
-                printf("\t %d", sol_x[i][j]);
+                printf("\t %.0f", sol_x[i][j]);
             }
             printf("\n");
         }
@@ -49,7 +49,7 @@ void ModelAssignmentProblem::printSolutionVariables(int digits, int decimals) {
 }
 
 void ModelAssignmentProblem::reserveSolutionSpace(const Data* data) {
-    sol_x.resize(V, vector<int>(V));
+    sol_x.resize(V, vector<double>(V));
 }
 
 void ModelAssignmentProblem::readSolution(const Data* data) {

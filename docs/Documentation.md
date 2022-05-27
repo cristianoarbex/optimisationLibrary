@@ -271,7 +271,7 @@ This is the abstraction of the [ModelAssignmentProblem class](#modelassignmentpr
 * Properties
   * string x: the string that describes the solution
   * int V: the number of variables
-  * vector<vector<int>> sol_x: the value of the variables
+  * vector<vector<double>> sol_x: the value of the variables
   
 * Private functions
   * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
@@ -321,7 +321,7 @@ This is the abstraction of the [ModelKnapsackProblem class](#modelknapsackproble
 * Properties
   * string x: the string that describes the solution
   * int V: the number of variables
-  * vector<int> sol_x: the value of the variables
+  * vector<double> sol_x: the value of the variables
   
 * Private functions
   * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
