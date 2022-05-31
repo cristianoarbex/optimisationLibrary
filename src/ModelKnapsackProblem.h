@@ -13,7 +13,7 @@ class ModelKnapsackProblem : public Model {
         
         // Solution values
         int V;
-        vector<int> sol_x;
+        vector<double> sol_x;
 
         virtual void reserveSolutionSpace(const Data* data);
         virtual void readSolution        (const Data* data);
