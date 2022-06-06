@@ -79,6 +79,7 @@ void DataAssignmentProblem::print() {
 
 
 double DataAssignmentProblem::getCost(int i, int j) const {
-    if (i >= numVariables || j >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getCost");
+    if (i >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter i in getCost");
+    if (j >= numVariables) Util::throwInvalidArgument("Error: Out of range parameter j in getCost");
     return costs[i][j];
 }

@@ -96,7 +96,38 @@ This is the abstraction of the [DataCapitalBudgeting class](#datacapitalbudgetin
   * int getInitialInvestment(int i): gets the initial investment.
   * int getFutureValue(int i): gets the future value of the variable. 
 
-  #### DataKnapsackProblem.h
+#### DataConcreteMixerTruckRouting.h
+
+This is the abstraction of the [DataConcreteMixerTruckRouting class](#dataconcretemixertruckrouting.cc).
+
+* Dependencies
+  * [Util.h](#util.h)
+  * [Data.h](#data.h)
+  * [StructClientDemand.h](#structclientdemand.h)
+
+* Properties
+  * int numberOfConstructions: the number of constructions
+  * int concreteMixerTruckFleet: the flet of croncrete mixer trucks
+  * int numberOfTypesOfConcrete: the number of concrete types
+  * double fixedCost: the fixed cost of using the concrete mixer truck
+  * double concreteMixerTruckCapacity: the capacity of a concrete mixer truck
+  * vector<ClientDemand> demands: the list fo demands of the clients
+  * vector<vector<double>> distances: the distances between constructions matrix 
+
+* Public functions
+  * DataConcreteMixerTruckRouting(): constructor
+  * ~DataConcreteMixerTruckRouting(): destructor
+  * void readData(): sets the data and parameters of the optimization problem
+  * void print(): prints the data of the optimization problem
+  * int getNumberOfConstructions(): gets the number of constructions
+  * int getConcreteMixerTruckFleet(): gets the fleet of concrete mixer trucks
+  * int getNumberOfTypesOfConcrete(): gets the number of concrete types
+  * double getFixedCost(): gets the fixed cost of using the concrete mixer truck
+  * double getConcreteMixerTruckCapacity(): gets the capacity of the concrete mixer trucks
+  * ClientDemand getDemand(int i): gets the demnand of a client in a construction
+  * double getDistance(int i, int j): gets the distance between 2 contructions
+
+#### DataKnapsackProblem.h
 
 This is the abstraction of the [DataKnapsackProblem class](#dataknapsackproblem.cc).
 
@@ -310,7 +341,35 @@ This is the abstraction of the [ModelCapitalBudgeting class](#modelcapitalbudget
   * ~ModelCapitalBudgeting(): destructor
   * void execute(const Data *data): executes the process of solving the Capital Budgeting problem
 
-  #### ModelKnapsackProblem.h
+#### ModelConcreteMixerTruckRouting.h
+
+This is the abstraction of the [ModelConcreteMixerTruckRouting class](#modelconcretemixertruckrouting.cc).
+
+* Dependencies
+  * [Model.h](#model.h)
+  * [Solution.h](#solution.h)
+
+* Properties
+  * string x: the string that describes the solution for x variable
+  * string y: the string that describes the solution for y variable
+  * int V: the number of points
+  * int K: number of concrete mixer trucks
+  * vector<vector<vector<double>>> sol_x: the matix of values of the variable x
+  * vector<double> sol_y: the vector of avalues of the variable y
+  
+* Private functions
+  * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
+  * void readSolution(const Data* data): gets the solution
+  * void assignWarmStart(const Data* data)
+  * void createModel(const Data* data): creates a model formatted to the solver based on the data 
+  * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+
+* Public functions
+  * ModelConcreteMixerTruckRouting(): constructor
+  * ~ModelConcreteMixerTruckRouting(): destructor
+  * void execute(const Data *data): executes the process of solving the Concrete Mixer Truck Routing Problem
+
+#### ModelKnapsackProblem.h
 
 This is the abstraction of the [ModelKnapsackProblem class](#modelknapsackproblem.cc).
 
@@ -471,6 +530,15 @@ It is the default class for the solver, so there are all the functions and prope
 
 * Dependencies
   * [Util.h](#util.h)
+
+#### StructClientDemand.h
+
+This is the struct that describes a demand of a client.
+
+* Properties
+  * int constructionId: the id of the construction
+  * double quantity: the quantity of concrete requested by the client in the construction 
+  * int concreteTypeId: the id of the type of concrete requested by the client in the construction 
 
 #### Util.h
 
@@ -666,6 +734,43 @@ This class is responsible to create and manage a data object for the Capital Bud
   * Returns:
     * The future value of a variable
 
+#### DataConcreteMixerTruckRouting.cc
+
+This class is responsible to create and manage a data object for the Concrete Mixer Truck Routing problem.
+
+* Dependencies
+  * [DataConcreteMixerTruckRouting.h](#dataconcretemixertruckrouting.h)
+  * [Options.h](#options.h)
+
+* DataConcreteMixerTruckRouting()
+  * Constructor
+  * Actions:
+    * Sets numberOfConstructions to 0 (zero)
+    * Sets concreteMixerTruckFleet to 0 (zero)
+    * Sets numberOfTypesOfConcrete to 0 (zero)
+* ~DataConcreteMixerTruckRouting() 
+  * Destructor
+* void readData()
+  * Actions:
+    * Validade the filename of the --input option
+    * Opens the file of the option --input, taht is a .txt file
+    * Reads each character of the file e fill the variables
+    * Closes the file
+* void print()
+  * Actions:
+    * Prints all the properties, if the *debug* option is activated
+* int getDemand()
+  * Parameters:
+    * int i: the index of the demand
+  * Returns:
+    * The demand
+* int getDistance()
+  * Parameters:
+    * int i: the index of the origin constrution
+    * int j: the index of the target constrution
+  * Returns:
+    * The destance between 2 constructions
+
 #### DataKnapsackProblem.cc
 
 This class is responsible to create and manage a data object for the Knapsack Problem.
@@ -800,11 +905,11 @@ This class is responsible to execute the main process to solve an optimization p
     * Deletes *data* instance
 * void execute()
   * Actions: 
-    * Calls the function [getTme()](#util.h) and sets the start time
+    * Calls the function [getTime()](#util.h) and sets the start time
     * Sets the *data* and the *model* according to the *model* option (it can be [DataCapitalBudgeting](#datacapitalbudgeting.h) and [ModelCapitalBudgeting](#modelcapitalbudgeting), or a defautl [Data](#data.h) and [Model](#model.h))
     * Calls the function [readData()](#data.h)
     * Calls the function [print()](#data.h)
-    * Calls the function [getTme()](#util.h) and calculates the total time
+    * Calls the function [getTime()](#util.h) and calculates the total time
 
 #### Model.cc
 
@@ -999,7 +1104,7 @@ This class is responsible to create and manage a model object for the Assignment
   * Parameters:
     * data: the object with the parameters of the Assignment problem.
   * Actions:
-    * Calls the function [getTme()](#util.h) and set the start time
+    * Calls the function [getTime()](#util.h) and set the start time
     * Calls the function [printSolverName()](#solver.h)
     * Calls the function createModel(data)
     * Calls the function reserveSolutionSpace(data)
@@ -1007,7 +1112,7 @@ This class is responsible to create and manage a model object for the Assignment
     * Calls the function setSolverParameters(0)
     * Calls the function [addInfoCallback(this)](#solver.h)
     * Calls the function solve(data)
-    * Calls the function [getTme()](#util.h) and calculate the total time
+    * Calls the function [getTime()](#util.h) and calculate the total time
     * Calls the function printSolutionVariables()
 
 #### ModelCapitalBudgeting.cc
@@ -1060,7 +1165,7 @@ This class is responsible to create and manage a model object for the Capital Bu
   * Parameters:
     * data: the object with the parameters of the Capital Budgeting problem.
   * Actions:
-    * Calls the function [getTme()](#util.h) and set the start time
+    * Calls the function [getTime()](#util.h) and set the start time
     * Calls the function [printSolverName()](#solver.h)
     * Calls the function createModel(data)
     * Calls the function reserveSolutionSpace(data)
@@ -1068,7 +1173,72 @@ This class is responsible to create and manage a model object for the Capital Bu
     * Calls the function setSolverParameters(1)
     * Calls the function [addInfoCallback(this)](#solver.h)
     * Calls the function solve(data)
-    * Calls the function [getTme()](#util.h) and calculate the total time
+    * Calls the function [getTime()](#util.h) and calculate the total time
+    * Calls the function printSolutionVariables()
+
+#### ModelConcreteMixerTruckRouting.cc
+
+This class is responsible to create and manage a model object for the Concrete Mixer Truck Routing problem.
+
+* Dependencies
+  * [ModelConcreteMixerTruckRouting.h](#modelconcretemixertruckrouting.h)
+  * [Options.h](#options.h)
+  * [DataConcreteMixerTruckRouting.h](#dataconcretemixertruckrouting.h)
+  
+* void reserveSolutionSpace(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Concrete Mixer Truck Routing problem.
+  * Actions:
+    * Resizes the sol_x array
+    * Resizes the sol_y array
+* void readSolution(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Concrete Mixer Truck Routing problem.
+  * Actions:
+    * Calls the function [getNodeCount()](#solver.h)
+    * Calls the function [resetSolution()](#solution.h)
+    * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
+    * If the solution does't exist, prints it
+    * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x and sol_y arrays
+* void createModel(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Concrete Mixer Truck Routing problem.
+  * Actions:
+    * Creates a [DataConcreteMixerTruckRouting](#dataconcretemixertruckrouting.h) instance
+    * Calls the function [getNumberOfConstructions](#dataconcretemixertruckrouting.h)
+    * Calls the function [getConcreteMixerTruckFleet](#dataconcretemixertruckrouting.h)
+    * Calls the function [changeObjectiveSense()](#solver.h)
+    * Sends the decision variables x and y to the solver calling [addBinaryVariable()](#solver.h)
+    * Sends the constraints to the solver
+* void printSolutionVariables(int digits = 5, int decimals = 2)
+  * Parameters:
+    * digits: maximum number of digits of the value of the solution
+    * decimals: maximum number of decimal places of the value of the solution
+  * Actions:
+    * Prints the value of each decision variable of the solution, if the *debug* option is activated
+
+* ModelConcreteMixerTruckRouting()
+  * Constructor
+  * Actions:
+    * Sets V to 0 (zero)
+    * Sets K to 0 (zero)
+    * Sets x to "x" 
+    * Sets y to "y" 
+* ~ModelConcreteMixerTruckRouting()
+  * Destructor
+* void execute(const Data *data)
+  * Parameters:
+    * data: the object with the parameters of the Capital Budgeting problem.
+  * Actions:
+    * Calls the function [getTime()](#util.h) and set the start time
+    * Calls the function [printSolverName()](#solver.h)
+    * Calls the function createModel(data)
+    * Calls the function reserveSolutionSpace(data)
+    * Calls the function assignWarmStart(data)
+    * Calls the function setSolverParameters(1)
+    * Calls the function [addInfoCallback(this)](#solver.h)
+    * Calls the function solve(data)
+    * Calls the function [getTime()](#util.h) and calculate the total time
     * Calls the function printSolutionVariables()
 
 #### ModelKnapsackProblem.cc
@@ -1121,7 +1291,7 @@ This class is responsible to create and manage a model object for the Knapsack P
   * Parameters:
     * data: the object with the parameters of the Knapsack problem.
   * Actions:
-    * Calls the function [getTme()](#util.h) and set the start time
+    * Calls the function [getTime()](#util.h) and set the start time
     * Calls the function [printSolverName()](#solver.h)
     * Calls the function createModel(data)
     * Calls the function reserveSolutionSpace(data)
@@ -1129,7 +1299,7 @@ This class is responsible to create and manage a model object for the Knapsack P
     * Calls the function setSolverParameters(1)
     * Calls the function [addInfoCallback(this)](#solver.h)
     * Calls the function solve(data)
-    * Calls the function [getTme()](#util.h) and calculate the total time
+    * Calls the function [getTime()](#util.h) and calculate the total time
     * Calls the function printSolutionVariables()
 
 #### ModelMotivatingProblem.cc
@@ -1182,7 +1352,7 @@ This class is responsible to create and manage a model object for the motivating
   * Parameters:
     * data: the object with the parameters of the motivating problem.
   * Actions:
-    * Calls the function [getTme()](#util.h) and set the start time
+    * Calls the function [getTime()](#util.h) and set the start time
     * Calls the function [printSolverName()](#solver.h)
     * Calls the function createModel(data)
     * Calls the function reserveSolutionSpace(data)
@@ -1190,7 +1360,7 @@ This class is responsible to create and manage a model object for the motivating
     * Calls the function setSolverParameters(1)
     * Calls the function [addInfoCallback(this)](#solver.h)
     * Calls the function solve(data)
-    * Calls the function [getTme()](#util.h) and calculate the total time
+    * Calls the function [getTime()](#util.h) and calculate the total time
     * Calls the function printSolutionVariables()
 
 #### Option.cc
