@@ -16,16 +16,26 @@ ModelConcreteMixerTruckRouting::~ModelConcreteMixerTruckRouting() {
 void ModelConcreteMixerTruckRouting::execute(const Data* data) {
 
     float startTime = Util::getTime();
-    
+
+    bool retry;    
+    int tryNumber = 0;
+
     if (debug > 1) solver->printSolverName();
     createModel(data);
-    reserveSolutionSpace(data);
-    assignWarmStart(data);
-    setSolverParameters(0);
 
-    solver->addInfoCallback(this);
+    do {
+        tryNumber++;
+        reserveSolutionSpace(data);
+        assignWarmStart(data);
+        setSolverParameters(0);
 
-    solve(data);
+        solver->addInfoCallback(this);
+
+        solve(data);
+
+        retry = checkIfThereIsAnySubtourInTheSolution();
+    } while (retry);
+
     totalTime = Util::getTime() - startTime;
     printSolutionVariables();
 } 
@@ -37,6 +47,7 @@ void ModelConcreteMixerTruckRouting::printSolutionVariables(int digits, int deci
         printf("\nSolution: \n");
         for (int k = 0; k < K; k++) {
             route.resize(V);
+            std::fill(route.begin(), route.end(), "");
             indexRoute = 0;
             printf("Concrete Mixer Truck %d \n", k);
             for (int j = 0; j < V; j++) {
@@ -46,7 +57,10 @@ void ModelConcreteMixerTruckRouting::printSolutionVariables(int digits, int deci
             for (int i = 0; i < V; i++) {
                 printf("X%dj", i);
                 for (int j = 0; j < V; j++) {
-                    printf("\t %.0f", sol_x[k][i][j]);
+                    if(i == j)
+                        printf("\t 0");
+                    else
+                        printf("\t %.0f", sol_x[k][i][j]);
 
                     if(sol_x[k][i][j] == 1) {
                         route[indexRoute] = "(" + lex(i) + ", " + lex(j) + ") "; 
@@ -89,7 +103,10 @@ void ModelConcreteMixerTruckRouting::readSolution(const Data* data) {
         for (int k = 0; k < K; k++) {
             for (int i = 0; i < V; i++) {
                 for (int j = 0; j < V; j++) {
-                    sol_x[k][i][j] = solver->getColValue(x + lex(k) + lex(i) + lex(j));
+                    if (i == j)
+                        sol_x[k][i][j] = 0;
+                    else
+                        sol_x[k][i][j] = solver->getColValue(x + lex(k) + UND + lex(i) + UND + lex(j));
                 }
             }
         }
@@ -112,7 +129,8 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
     for (int k = 0; k < K; k++) {
         for (int i = 0; i < V; i++) {
             for (int j = 0; j < V; j++) {
-                solver->addBinaryVariable(dataCMR->getDistance(i, j), x + lex(k) + lex(i) + lex(j));
+                if (i != j)
+                    solver->addBinaryVariable(dataCMR->getDistance(i, j), x + lex(k) + UND + lex(i) + UND + lex(j));
             }
         }
     }
@@ -122,159 +140,139 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
         solver->addBinaryVariable(dataCMR->getFixedCost(), y + lex(k));
 
 
-    vector<vector<vector<string>>> colNamesX;
-    vector<vector<vector<double>>> elementsX;
-
-    vector<string> colNamesY;
-    vector<double> elementsY;
-
-    vector<string> colNamesAux;
-    vector<double> elementsAux;
-
-    colNamesX   .resize(K,vector<vector<string>>(V, vector<string>(V)));
-    elementsX   .resize(K,vector<vector<double>>(V, vector<double>(V)));
-    colNamesY   .resize(K                                             );
-    elementsY   .resize(K                                             );
+    vector<string> colNames;
+    vector<double> elements;
 
     int indexAux;
     
-    // constraint 1c
-    colNamesAux.resize(V);
-    elementsAux.resize(V);
-    for (int k = 0; k < K; k++) {
-        for (int i = 0; i < V; i++) {
-            indexAux = 0;
-
-            for (int j = 0; j < V; j++) {
-                colNamesX[k][i][j] = x + lex(k) + lex(i) + lex(j);
-                elementsX[k][i][j] = 1;
-                colNamesAux[indexAux] = colNamesX[k][i][j];
-                elementsAux[indexAux] = elementsX[k][i][j];
-                indexAux++;
+    // at least one concrete mixer truck attends a client (1b and 1c)
+    colNames.resize(K * V - K);
+    elements.resize(K * V - K);
+    for (int j = 1; j < V; j++) {
+        indexAux = 0;
+        for (int k = 0; k < K; k++) {
+            for (int i = 0; i < V; i++) {
+                if (j != i) {
+                    colNames[indexAux] = x + lex(k) + UND + lex(i) + UND + lex(j);
+                    elements[indexAux] = 1;
+                    indexAux++;
+                }
             }
-            solver->addRow(colNamesX[k][i], elementsX[k][i], 1, 'E', "constraint");
         }
+        solver->addRow(colNames, elements, 1, 'E', "constraint1b_" + lex(j));
     }
 
-    // constraint 1b
-    for (int k = 0; k < K; k++) {
-        vector<vector<string>> transposedColNames = Util::transposeStringMatrix(colNamesX[k], V, V);
-        vector<vector<double>> transposedElements = Util::transposeDoubleMatrix(elementsX[k], V, V);
-
-        for (int j = 0; j < V; j++) {
-            solver->addRow(transposedColNames[j], transposedElements[j], 1, 'E', "constraint");
+    colNames.resize(K * V - K);
+    elements.resize(K * V - K);
+    for (int i = 1; i < V; i++) {
+        indexAux = 0;
+        for (int k = 0; k < K; k++) {
+            for (int j = 0; j < V; j++) {
+                if (i != j) {
+                    colNames[indexAux] = x + lex(k) + UND + lex(i) + UND + lex(j);
+                    elements[indexAux] = 1;
+                    indexAux++;
+                }
+            }
         }
+        solver->addRow(colNames, elements, 1, 'E', "constraint1c_" + lex(i));
     }
 
-    // constraint 1d - testar mais
-    colNamesAux.resize(V + 1);
-    elementsAux.resize(V + 1);
+    // relationship between x and y (1d)
+    colNames.resize(V);
+    elements.resize(V);
     for (int k = 0; k < K; k++) {
         indexAux = 0;
 
-        for (int j = 0; j < V; j++) {
-            colNamesX[k][0][j] = x + lex(k) + '0' + lex(j);
-            elementsX[k][0][j] = 1;
-            colNamesAux[indexAux] = colNamesX[k][0][j];
-            elementsAux[indexAux] = elementsX[k][0][j];
+        for (int j = 1; j < V; j++) {
+            colNames[indexAux] = x + lex(k) + UND + '0' + UND + lex(j);
+            elements[indexAux] = 1;
             indexAux++;
         }
 
-        colNamesY[k] = y + lex(k);
-        elementsY[k] = -1;
-        
-        colNamesAux[indexAux] = colNamesY[k];
-        elementsAux[indexAux] = elementsY[k];
+        colNames[indexAux] = y + lex(k);
+        elements[indexAux] = -1;
 
-        solver->addRow(colNamesAux, elementsAux, 0, 'L', "constraint");
+        solver->addRow(colNames, elements, 0, 'L', "constraint1d_" + lex(k));
     }
 
-    // constraint ie - testar
-    colNamesAux.resize(V + V);
-    elementsAux.resize(V + V);
+    // truck sequence (truck queue) constraint (1e)
+    colNames.resize(V + V - 2);
+    elements.resize(V + V - 2);
     for (int k = 1; k < K; k++) {
         indexAux = 0;
 
-        for (int j = 0; j < V; j++) {
-            colNamesX[k-1][0][j] = x + lex(k) + '0' + lex(j);
-            elementsX[k-1][0][j] = 1;
-            colNamesAux[indexAux] = colNamesX[k-1][0][j];
-            elementsAux[indexAux] = elementsX[k-1][0][j];
+        for (int j = 1; j < V; j++) {
+            colNames[indexAux] = x + lex(k-1) + UND + '0' + UND + lex(j);
+            elements[indexAux] = 1;
             indexAux++;
         }
 
-        for (int j = 0; j < V; j++) {
-            colNamesX[k][0][j] = x + lex(k) + '0' + lex(j);
-            elementsX[k][0][j] = -1;
-            colNamesAux[indexAux] = colNamesX[k][0][j];
-            elementsAux[indexAux] = elementsX[k][0][j];
+        for (int j = 1; j < V; j++) {
+            colNames[indexAux] = x + lex(k) + UND + '0' + UND + lex(j);
+            elements[indexAux] = -1;
             indexAux++;
         }
 
-        solver->addRow(colNamesAux, elementsAux, 0, 'G', "constraint");
+        solver->addRow(colNames, elements, 0, 'G', "constraint1e_" + lex(k));
     }
 
-    // constraint 1f - testar
-    colNamesAux.resize((V - 1) + (V - 1));
-    elementsAux.resize((V - 1) + (V - 1));
+    // enter and leave constraint (1f)
+    colNames.resize((V - 1) + (V - 1));
+    elements.resize((V - 1) + (V - 1));
     for (int k = 0; k < K; k++) {
         for (int h = 0; h < V; h++) {
             indexAux = 0;
 
             for (int i = 0; i < V; i++) {
                 if (h != i) {
-                    colNamesX[k][i][h] = x + lex(k) + lex(i) + lex(h);
-                    elementsX[k][i][h] = 1;
-                    colNamesAux[indexAux] = colNamesX[k][i][h];
-                    elementsAux[indexAux] = elementsX[k][i][h];
+                    colNames[indexAux] = x + lex(k) + UND + lex(i) + UND + lex(h);
+                    elements[indexAux] = 1;
                     indexAux++;
                 }
             }
 
             for (int j = 0; j < V; j++) {
                 if (h != j) {
-                    colNamesX[k][h][j] = x + lex(k) + lex(h) + lex(j);
-                    elementsX[k][h][j] = -1;
-                    colNamesAux[indexAux] = colNamesX[k][h][j];
-                    elementsAux[indexAux] = elementsX[k][h][j];
+                    colNames[indexAux] = x + lex(k) + UND + lex(h) + UND + lex(j);
+                    elements[indexAux] = -1;
                     indexAux++;
                 }
             }
 
-            solver->addRow(colNamesAux, elementsAux, 0, 'E', "constraint");
+            solver->addRow(colNames, elements, 0, 'E', "constraint1f_" + lex(k) + UND + lex(h));
         } 
     }
 
-    // constraint 1h - verificar
-    colNamesAux.resize(V * V);
-    elementsAux.resize(V * V);
+    // capacity constraint (1h)
+    colNames.resize(V * V - V);
+    elements.resize(V * V - V);
     for (int k = 0; k < K; k++) {
         indexAux = 0;
+
         for (int j = 0; j < V; j++) {
             for (int i = 0; i < V; i++) {
-                colNamesX[k][i][j] = x + lex(k) + lex(i) + lex(j);
-                elementsX[k][i][j] = dataCMR->getDemand(j).quantity;
-                // adicionar condição caso o cliente peça mais que cabe na betoneira
-                colNamesAux[indexAux] = colNamesX[k][i][j];
-                elementsAux[indexAux] = elementsX[k][i][j];
-                indexAux++;
+                if (i != j) {
+                    colNames[indexAux] = x + lex(k) + UND + lex(i) + UND + lex(j);
+                    elements[indexAux] = dataCMR->getDemand(j).quantity;
+                    indexAux++;
+                }
             }
         }
-        solver->addRow(colNamesAux, elementsAux, dataCMR->getConcreteMixerTruckCapacity(), 'L', "constraint");
+
+        solver->addRow(colNames, elements, dataCMR->getConcreteMixerTruckCapacity(), 'L', "constraint1h_" + lex(k));
     }
 
-    // constraint 1j and 1k
-    colNamesAux.resize(1);
-    elementsAux.resize(1);
+    // concrete type constraint (1k) 
+    colNames.resize(1);
+    elements.resize(1);
     for (int k = 0; k < K; k++) {
         for (int i = 0; i < V; i++) {
             for (int j = 0; j < V; j++) {
-                if (i == j || (i != j && dataCMR->getDemand(i).concreteTypeId != dataCMR->getDemand(j).concreteTypeId)) {
-                    colNamesX[k][i][j] = x + lex(k) + lex(i) + lex(j);
-                    elementsX[k][i][j] = 1;
-                    colNamesAux[0] = colNamesX[k][i][j];
-                    elementsAux[0] = elementsX[k][i][j];
-                    solver->addRow(colNamesAux, elementsAux, 0, 'E', "constraint");
+                if (i != j && dataCMR->getDemand(i).concreteTypeId != dataCMR->getDemand(j).concreteTypeId) {
+                    colNames[0] = x + lex(k) + UND + lex(i) + UND + lex(j);
+                    elements[0] = 1;
+                    solver->addRow(colNames, elements, 0, 'E', "constraint1k_" + lex(k) + UND + lex(i) + UND + lex(j));
                 }
             }
         }
@@ -283,4 +281,49 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
 
 void ModelConcreteMixerTruckRouting::assignWarmStart(const Data* data) {
    
+}
+
+bool ModelConcreteMixerTruckRouting::checkIfThereIsAnySubtourInTheSolution() {
+    
+    bool isleavingTheDepot;
+    bool isArrivingTheDepot;
+    bool retry = false;
+
+    if (solver->solutionExists() && !solver->isInfeasible() && !solver->isUnbounded()) {
+
+        for (int k = 0; k < K; k++) {
+
+            isleavingTheDepot = false;
+            isArrivingTheDepot = false;
+
+            for (int i = 1; i < V; i++) {
+                if (sol_x[k][0][i] == 1)
+                    isleavingTheDepot = true;
+
+                if (sol_x[k][i][0] == 1)
+                    isArrivingTheDepot = true;
+            }
+
+            if (!isleavingTheDepot || !isArrivingTheDepot) {
+                vector<string> colNames;
+                vector<double> elements;
+
+                for (int i = 1; i < V; i++) {
+                    for (int j = 1; j < V; j++) {
+                        if (sol_x[k][i][j] == 1) {
+                            colNames.push_back(x + lex(k) + UND + lex(i) + UND + lex(j));
+                            elements.push_back(1);
+                        }
+                    }
+                }
+
+                if (colNames.size() > 1) {
+                    solver->addRow(colNames, elements, colNames.size() - 1, 'L', "constraint1g_" + lex(k));
+                    retry = true;
+                }
+            }
+        }
+    } 
+    
+    return retry;
 }

@@ -112,12 +112,12 @@ void DataConcreteMixerTruckRouting::print() {
         printf("concrete mixer truck capacity\n");
         printf("%.2f\n\n", concreteMixerTruckCapacity);
         printf("demands\n");
-        for (int i = 0; i < numberOfConstructions; i++) {
+        for (int i = 0; i <= numberOfConstructions; i++) {
             printf("demandId: %d\t quantity: %.2f\t concreteTypeId: %2d\n", demands[i].constructionId, demands[i].quantity, demands[i].concreteTypeId);
         }
         printf("\ndistances\n");
-        for (int i = 0; i < numberOfConstructions; i++) {
-            for (int j = 0; j < numberOfConstructions; j++) {
+        for (int i = 0; i <= numberOfConstructions; i++) {
+            for (int j = 0; j <= numberOfConstructions; j++) {
                 printf("%.2f\t", distances[i][j]);
             }
             printf("\n");

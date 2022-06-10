@@ -25,6 +25,7 @@ class ModelConcreteMixerTruckRouting : public Model {
         virtual void createModel         (const Data* data);
         
         void printSolutionVariables(int digits = 5, int decimals = 2);
+        bool checkIfThereIsAnySubtourInTheSolution();
         
     public:
         

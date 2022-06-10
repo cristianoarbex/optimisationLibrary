@@ -363,6 +363,7 @@ This is the abstraction of the [ModelConcreteMixerTruckRouting class](#modelconc
   * void assignWarmStart(const Data* data)
   * void createModel(const Data* data): creates a model formatted to the solver based on the data 
   * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+  * bool checkIfThereIsAnySubtourInTheSolution(): defines if the system needs to retry to solve the problem because of the existance of a subtour.
 
 * Public functions
   * ModelConcreteMixerTruckRouting(): constructor
@@ -1216,6 +1217,13 @@ This class is responsible to create and manage a model object for the Concrete M
     * decimals: maximum number of decimal places of the value of the solution
   * Actions:
     * Prints the value of each decision variable of the solution, if the *debug* option is activated
+* bool checkIfThereIsAnySubtourInTheSolution()
+  * Actions: 
+    * Verifies if the solution exists, if it is feasible and if it is unbounded
+    * for each concrete mixer truck, defines if it is leaving the depot and if it is arriving the depot, to understand if there is any subtour
+    * If there is a subtour, adds a constraint that doesn't allow this to happen
+  * Returns:
+    * If the system needs to retry to solve the problem  
 
 * ModelConcreteMixerTruckRouting()
   * Constructor
