@@ -103,7 +103,6 @@ This is the abstraction of the [DataConcreteMixerTruckRouting class](#dataconcre
 * Dependencies
   * [Util.h](#util.h)
   * [Data.h](#data.h)
-  * [StructClientDemand.h](#structclientdemand.h)
 
 * Properties
   * int numberOfConstructions: the number of constructions
@@ -126,6 +125,30 @@ This is the abstraction of the [DataConcreteMixerTruckRouting class](#dataconcre
   * double getConcreteMixerTruckCapacity(): gets the capacity of the concrete mixer trucks
   * ClientDemand getDemand(int i): gets the demnand of a client in a construction
   * double getDistance(int i, int j): gets the distance between 2 contructions
+
+* Class ClientDemand
+This is the object that describes a demand of a client.
+
+* Properties
+  * int constructionId: the id of the construction
+  * double quantity: the quantity of concrete requested by the client in the construction 
+  * int concreteTypeId: the id of the type of concrete requested by the client in the construction 
+
+* Functions
+  * ClientDemand(): constructor
+  * ~ClientDemand(): destructor
+  * double getQuantity(int constructionId)
+    * Returns:
+      * the quantity of the client demand
+  * int getConcreteTypeId(int constructionId)
+    * Returns:
+      * the type id of the client demand
+  * void setQuantity(double value)
+    * Actions:
+      * sets the quantity of the client demand
+  * void setConcreteTypeId(int id)
+    * Actions:
+      * sets the concrete type id of the client demand  
 
 #### DataKnapsackProblem.h
 
@@ -364,6 +387,8 @@ This is the abstraction of the [ModelConcreteMixerTruckRouting class](#modelconc
   * void createModel(const Data* data): creates a model formatted to the solver based on the data 
   * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
   * bool checkIfThereIsAnySubtourInTheSolution(): defines if the system needs to retry to solve the problem because of the existance of a subtour.
+  * vector<SolverCut> separationAlgorithm(vector<double> sol): creates the cutting planes
+  * void traverse(int k, int i, vector<bool> visited) and bool isConnected(int vehicleIndex): analyzes if the graph is connected.
 
 * Public functions
   * ModelConcreteMixerTruckRouting(): constructor
@@ -531,15 +556,6 @@ It is the default class for the solver, so there are all the functions and prope
 
 * Dependencies
   * [Util.h](#util.h)
-
-#### StructClientDemand.h
-
-This is the struct that describes a demand of a client.
-
-* Properties
-  * int constructionId: the id of the construction
-  * double quantity: the quantity of concrete requested by the client in the construction 
-  * int concreteTypeId: the id of the type of concrete requested by the client in the construction 
 
 #### Util.h
 
@@ -1224,6 +1240,16 @@ This class is responsible to create and manage a model object for the Concrete M
     * If there is a subtour, adds a constraint that doesn't allow this to happen
   * Returns:
     * If the system needs to retry to solve the problem  
+* vector<SolverCut> separationAlgorithm(vector<double> sol)
+  * Actions:
+    * Verifies if the solution is integer
+    * Verifies if the graph of each concrete mixer truck is connected
+    * Creates the cuts
+  * Returns:
+    * The list of cuts
+* void traverse(int k, int i, vector<bool> visited) and bool isConnected(int vehicleIndex)
+  * Returns:
+    * If the graph is connected
 
 * ModelConcreteMixerTruckRouting()
   * Constructor

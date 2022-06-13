@@ -26,6 +26,9 @@ class ModelConcreteMixerTruckRouting : public Model {
         
         void printSolutionVariables(int digits = 5, int decimals = 2);
         bool checkIfThereIsAnySubtourInTheSolution();
+        vector<SolverCut> separationAlgorithm(vector<double> sol);
+        void traverse(int k, int i, vector<bool> visited);
+        bool isConnected(int vehicleIndex);
         
     public:
         

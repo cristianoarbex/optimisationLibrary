@@ -23,7 +23,16 @@ void ModelConcreteMixerTruckRouting::execute(const Data* data) {
     if (debug > 1) solver->printSolverName();
     createModel(data);
 
-    do {
+     reserveSolutionSpace(data);
+     assignWarmStart(data);
+     setSolverParameters(0);
+
+     solver->addInfoCallback(this);
+     solver->addLazyCallback(this);
+
+     solve(data);
+
+    /*do {
         tryNumber++;
         reserveSolutionSpace(data);
         assignWarmStart(data);
@@ -34,7 +43,7 @@ void ModelConcreteMixerTruckRouting::execute(const Data* data) {
         solve(data);
 
         retry = checkIfThereIsAnySubtourInTheSolution();
-    } while (retry);
+    } while (retry);*/
 
     totalTime = Util::getTime() - startTime;
     printSolutionVariables();
@@ -42,44 +51,46 @@ void ModelConcreteMixerTruckRouting::execute(const Data* data) {
 
 void ModelConcreteMixerTruckRouting::printSolutionVariables(int digits, int decimals) {
     if (debug) {
-        vector<string> route;
-        int indexRoute;
-        printf("\nSolution: \n");
-        for (int k = 0; k < K; k++) {
-            route.resize(V);
-            std::fill(route.begin(), route.end(), "");
-            indexRoute = 0;
-            printf("Concrete Mixer Truck %d \n", k);
-            for (int j = 0; j < V; j++) {
-                printf("\t Xi%d", j);
-            }
-            printf("\n");
-            for (int i = 0; i < V; i++) {
-                printf("X%dj", i);
+        if (solver->solutionExists() && !solver->isInfeasible() && !solver->isUnbounded()) {
+            vector<string> route;
+            int indexRoute;
+            printf("\nSolution: \n");
+            for (int k = 0; k < K; k++) {
+                route.resize(V);
+                std::fill(route.begin(), route.end(), "");
+                indexRoute = 0;
+                printf("Concrete Mixer Truck %d \n", k);
                 for (int j = 0; j < V; j++) {
-                    if(i == j)
-                        printf("\t 0");
-                    else
-                        printf("\t %.0f", sol_x[k][i][j]);
+                    printf("\t Xi%d", j);
+                }
+                printf("\n");
+                for (int i = 0; i < V; i++) {
+                    printf("X%dj", i);
+                    for (int j = 0; j < V; j++) {
+                        if(i == j)
+                            printf("\t 0");
+                        else
+                            printf("\t %.0f", sol_x[k][i][j]);
 
-                    if(sol_x[k][i][j] == 1) {
-                        route[indexRoute] = "(" + lex(i) + ", " + lex(j) + ") "; 
-                        indexRoute++;
+                        if(round(sol_x[k][i][j]) == 1) {
+                            route[indexRoute] = "(" + lex(i) + ", " + lex(j) + ") "; 
+                            indexRoute++;
+                        }
+
                     }
-
+                    printf("\n");
+                }
+                printf("\n");
+                printf("Route (Concrete Mixer Truck %d): ", k);
+                for (int i = 0; i < V; i++) {
+                    printf("%s", route[i].c_str());
                 }
                 printf("\n");
             }
             printf("\n");
-            printf("Route (Concrete Mixer Truck %d): ", k);
-            for (int i = 0; i < V; i++) {
-                printf("%s", route[i].c_str());
+            for (int k = 0; k < K; k++) {
+                printf("y%d: %.0f\n", k, sol_y[k]);
             }
-            printf("\n");
-        }
-        printf("\n");
-        for (int k = 0; k < K; k++) {
-            printf("y%d: %.0f\n", k, sol_y[k]);
         }
     }
 
@@ -159,7 +170,7 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
                 }
             }
         }
-        solver->addRow(colNames, elements, 1, 'E', "constraint1b_" + lex(j));
+        solver->addRow(colNames, elements, 1, 'G', "constraint1b_" + lex(j));
     }
 
     colNames.resize(K * V - K);
@@ -175,7 +186,7 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
                 }
             }
         }
-        solver->addRow(colNames, elements, 1, 'E', "constraint1c_" + lex(i));
+        solver->addRow(colNames, elements, 1, 'G', "constraint1c_" + lex(i));
     }
 
     // relationship between x and y (1d)
@@ -254,7 +265,7 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
             for (int i = 0; i < V; i++) {
                 if (i != j) {
                     colNames[indexAux] = x + lex(k) + UND + lex(i) + UND + lex(j);
-                    elements[indexAux] = dataCMR->getDemand(j).quantity;
+                    elements[indexAux] = dataCMR->getDemand(j).getQuantity(dataCMR->getDemand(j).constructionId);
                     indexAux++;
                 }
             }
@@ -267,9 +278,9 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
     colNames.resize(1);
     elements.resize(1);
     for (int k = 0; k < K; k++) {
-        for (int i = 0; i < V; i++) {
-            for (int j = 0; j < V; j++) {
-                if (i != j && dataCMR->getDemand(i).concreteTypeId != dataCMR->getDemand(j).concreteTypeId) {
+        for (int i = 1; i < V; i++) {
+            for (int j = 1; j < V; j++) {
+                if (i != j && dataCMR->getDemand(i).getConcreteTypeId(dataCMR->getDemand(i).constructionId) != dataCMR->getDemand(j).getConcreteTypeId(dataCMR->getDemand(j).constructionId)) {
                     colNames[0] = x + lex(k) + UND + lex(i) + UND + lex(j);
                     elements[0] = 1;
                     solver->addRow(colNames, elements, 0, 'E', "constraint1k_" + lex(k) + UND + lex(i) + UND + lex(j));
@@ -285,45 +296,141 @@ void ModelConcreteMixerTruckRouting::assignWarmStart(const Data* data) {
 
 bool ModelConcreteMixerTruckRouting::checkIfThereIsAnySubtourInTheSolution() {
     
-    bool isleavingTheDepot;
-    bool isArrivingTheDepot;
+    // bool isleavingTheDepot;
+    // bool isArrivingTheDepot;
+    // bool retry = false;
+    // if (solver->solutionExists() && !solver->isInfeasible() && !solver->isUnbounded()) {
+    //     for (int k = 0; k < K; k++) {
+    //         isleavingTheDepot = false;
+    //         isArrivingTheDepot = false;
+
+    //         for (int i = 1; i < V; i++) {
+    //             if (round(sol_x[k][0][i]) == 1)
+    //                 isleavingTheDepot = true;
+
+    //             if (round(sol_x[k][i][0]) == 1)
+    //                 isArrivingTheDepot = true;
+    //         }
+
+    //         if (!isleavingTheDepot || !isArrivingTheDepot) {
+    //             vector<string> colNames;
+    //             vector<double> elements;
+
+    //             for (int i = 1; i < V; i++) {
+    //                 for (int j = 1; j < V; j++) {
+    //                     if (i != j && round(sol_x[k][i][j]) == 1) {
+    //                         colNames.push_back(x + lex(k) + UND + lex(i) + UND + lex(j));
+    //                         elements.push_back(1);
+    //                     }
+    //                 }
+    //             }
+
+    //             if (colNames.size() > 1) {
+    //                 solver->addRow(colNames, elements, colNames.size() - 1, 'L', "constraint1g_" + lex(k));
+    //                 retry = true;
+    //             }
+    //         }
+    //     }
+    // } 
+    
+    // return retry;
+
+    bool routeIsConnected;
     bool retry = false;
 
-    if (solver->solutionExists() && !solver->isInfeasible() && !solver->isUnbounded()) {
+    for (int k = 0; k < K; k++) {
 
-        for (int k = 0; k < K; k++) {
+        routeIsConnected = isConnected(k);
 
-            isleavingTheDepot = false;
-            isArrivingTheDepot = false;
+        if (!routeIsConnected) {
+            vector<string> colNames;
+            vector<double> elements;
 
             for (int i = 1; i < V; i++) {
-                if (sol_x[k][0][i] == 1)
-                    isleavingTheDepot = true;
-
-                if (sol_x[k][i][0] == 1)
-                    isArrivingTheDepot = true;
+                for (int j = 1; j < V; j++) {
+                    if (i != j && round(sol_x[k][i][j]) == 1) {
+                        colNames.push_back(x + lex(k) + UND + lex(i) + UND + lex(j));
+                        elements.push_back(1);
+                    }
+                }
             }
 
-            if (!isleavingTheDepot || !isArrivingTheDepot) {
-                vector<string> colNames;
-                vector<double> elements;
+            if (colNames.size() > 1) {
+                solver->addRow(colNames, elements, colNames.size() - 1, 'L', "constraint1g_" + lex(k));
+                retry = true;
+            }
+        }
+    }
 
+    return retry;
+}
+
+// Cutting plane
+
+vector<SolverCut> ModelConcreteMixerTruckRouting::separationAlgorithm(vector<double> sol) {
+    vector<SolverCut> cuts;
+    bool isInteger = true;
+    bool routeIsConnected;
+
+    for (unsigned i = 0; i < sol.size(); i++) {
+        if (fabs(sol[i] - round(sol[i])) > TOLERANCE) {
+            isInteger = false;
+            break;
+        }
+    }
+
+    if (isInteger) {
+        for (int k = 0; k < K; k++) {
+
+            routeIsConnected = isConnected(k);
+
+            if (!routeIsConnected) {
+                SolverCut cut;
                 for (int i = 1; i < V; i++) {
                     for (int j = 1; j < V; j++) {
-                        if (sol_x[k][i][j] == 1) {
-                            colNames.push_back(x + lex(k) + UND + lex(i) + UND + lex(j));
-                            elements.push_back(1);
+                        if (i != j) {
+                            double currentSolIndex = solver->getColIndex(x + lex(k) + UND + lex(i) + UND + lex(j));
+                            if (sol[currentSolIndex] == 1) {
+                                cut.addCoef(currentSolIndex, 1);
+                            }
                         }
                     }
                 }
 
-                if (colNames.size() > 1) {
-                    solver->addRow(colNames, elements, colNames.size() - 1, 'L', "constraint1g_" + lex(k));
-                    retry = true;
+                if (cut.getCoefs().size() > 1) {
+                    cut.setName("cut1g_" + lex(k));
+                    cut.setSense('L');
+                    cut.setRHS(cut.getCoefs().size() - 1);
+                    cuts.push_back(cut);
                 }
             }
         }
     } 
     
-    return retry;
+    return cuts;
+}
+
+void ModelConcreteMixerTruckRouting::traverse(int k, int i, vector<bool> visited) {
+    visited[i] = true; //mark v as visited
+    for (int v = 0; v < V; v++) {
+        if (sol_x[k][i][v] == 1) {
+            if (!visited[v])
+                traverse(k, v, visited);
+        }
+    }
+}
+bool ModelConcreteMixerTruckRouting::isConnected(int vehicleIndex) {
+    vector<bool> alreadyVisited;
+    alreadyVisited.resize(V);
+    //for all vertex u as start point, check whether all nodes are visible or not
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++)
+            alreadyVisited[j] = false; //initialize as no node is visited
+        traverse(vehicleIndex, i, alreadyVisited);
+        for (int j = 0; j < V; j++) {
+            if (!alreadyVisited[i]) //if there is a node, not visited by traversal, graph is not connected
+                return false;
+        }
+    }
+    return true;
 }

@@ -32,6 +32,8 @@ void DataConcreteMixerTruckRouting::readData() {
 
     try {
         char buffer[50];
+        double quantity;
+        int type;
         // number of constructions
         if (fscanf(file, "%s", buffer                       ) != 1) throw std::invalid_argument("");
         if (fscanf(file, "%s", buffer                       ) != 1) throw std::invalid_argument("");
@@ -75,11 +77,14 @@ void DataConcreteMixerTruckRouting::readData() {
         distances .resize(numberOfConstructions + 1, vector<double>(numberOfConstructions + 1));
 
         // demands
-        if (fscanf(file, "%s", buffer                                                 ) != 1) throw std::invalid_argument("");
+        if (fscanf(file, "%s", buffer                           ) != 1) throw std::invalid_argument("");
         for (int i = 0; i <= numberOfConstructions; i++) {
-            if (fscanf(file, "%d", &demands[i].constructionId                         ) != 1) throw std::invalid_argument("");
-            if (fscanf(file, "%lf", &demands[demands[i].constructionId].quantity      ) != 1) throw std::invalid_argument("");
-            if (fscanf(file, "%d", &demands[demands[i].constructionId].concreteTypeId ) != 1) throw std::invalid_argument("");
+            if (fscanf(file, "%d", &demands[i].constructionId   ) != 1) throw std::invalid_argument("");
+            if (fscanf(file, "%lf", &quantity                   ) != 1) throw std::invalid_argument("");
+            if (fscanf(file, "%d", &type                        ) != 1) throw std::invalid_argument("");
+
+            demands[demands[i].constructionId].setQuantity          (quantity);
+            demands[demands[i].constructionId].setConcreteTypeId    (type    );
         }
 
         // distances
@@ -113,7 +118,7 @@ void DataConcreteMixerTruckRouting::print() {
         printf("%.2f\n\n", concreteMixerTruckCapacity);
         printf("demands\n");
         for (int i = 0; i <= numberOfConstructions; i++) {
-            printf("demandId: %d\t quantity: %.2f\t concreteTypeId: %2d\n", demands[i].constructionId, demands[i].quantity, demands[i].concreteTypeId);
+            printf("demandId: %d\t quantity: %.2f\t concreteTypeId: %2d\n", demands[i].constructionId, demands[i].getQuantity(demands[i].constructionId), demands[i].getConcreteTypeId(demands[i].constructionId));
         }
         printf("\ndistances\n");
         for (int i = 0; i <= numberOfConstructions; i++) {

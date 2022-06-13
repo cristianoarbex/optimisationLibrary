@@ -4,7 +4,32 @@
 
 #include "Util.h"
 #include "Data.h"
-#include "StructClientDemand.h"
+
+// Client concrete demand
+class ClientDemand {
+
+    private:
+        double  quantity;
+        int     concreteTypeId;
+
+    public:
+        int     constructionId;
+
+        ClientDemand() {}
+
+        ~ClientDemand() {}
+
+        double getQuantity      (int constructionId) const { return quantity; }
+        int getConcreteTypeId   (int constructionId) const { return concreteTypeId; }
+
+        void setQuantity(double value) {
+            quantity = value;
+        }
+
+        void setConcreteTypeId(int id) {
+            concreteTypeId = id;
+        }
+};
 
 class DataConcreteMixerTruckRouting : public Data {
 
