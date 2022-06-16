@@ -25,10 +25,9 @@ class ModelConcreteMixerTruckRouting : public Model {
         virtual void createModel         (const Data* data);
         
         void printSolutionVariables(int digits = 5, int decimals = 2);
-        bool checkIfThereIsAnySubtourInTheSolution();
         vector<SolverCut> separationAlgorithm(vector<double> sol);
-        void traverse(int k, int i, vector<bool> visited);
-        bool isConnected(int vehicleIndex);
+        void traverseGraph(int vehicleId, int vertex, vector<bool> visited);
+        bool graphIsConnected(int vehicleIndex);
         
     public:
         
