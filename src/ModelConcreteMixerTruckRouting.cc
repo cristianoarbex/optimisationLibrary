@@ -201,9 +201,6 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
             colNames[indexAux] = x + lex(k-1) + UND + '0' + UND + lex(j);
             elements[indexAux] = 1;
             indexAux++;
-        }
-
-        for (int j = 1; j < V; j++) {
             colNames[indexAux] = x + lex(k) + UND + '0' + UND + lex(j);
             elements[indexAux] = -1;
             indexAux++;
