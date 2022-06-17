@@ -54,6 +54,7 @@ long gettimeofday(struct timezone * tzp) {
 #include <memory>
 #include <random>
 #include <chrono>
+#include <cctype>
 
 
 ////////////////////////////
