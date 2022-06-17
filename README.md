@@ -95,7 +95,6 @@ C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\concert\lib\x64_windows_msvc14\s
 
 * Go to Project Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions and add:
 ```sh
-sh
 WIN32
 _CONSOLE
 IL_STD
