@@ -75,35 +75,45 @@ cmake ..
 ~/build/bin/Release/
 ```
 
-9. If the cmake's log shows some error, configure it in the Visual Studio:
-* Go to Project Properties -> C/C++ -> General -> Additional Include Directories and add:
+9. If the cmake's log shows some error, configure it in the visual studio:
+* Go to *Build -> Configuration Manager* and in *Active soluction platform* select *<New...>*.
+* Fill:
+```sh
+Type or select the new platform = x64
+Copy settings from: <Empty>
+```
+* Click *Ok*
+* Select *x64* as the active solution and select *optlib* and *ZERO_CHECK*
+* Click *Close*
+* Right click in the project *optlib*, then *Properties*
+* Go to Configuration Properties -> C/C++ -> General -> Additional Include Directories and add:
 ```sh
 C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\include
 C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\concert\include
 ```
-
-> **WARNING**:  <version> is the CPLEX Studio version
-
-* Go to Project Properties -> Linker -> Input -> Additional Dependencies and add:
+> **WARNING**: <version> is the CPLEX Studio version
+* Go to Configuration Properties -> Linker -> Input -> Additional Dependencies and add:
 ```sh
 C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\lib\x64_windows_msvc14\stat_mda\cplex<version>.lib
 C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\lib\x64_windows_msvc14\stat_mda\ilocplex.lib
 C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\concert\lib\x64_windows_msvc14\stat_mda\concert.lib
 ```
-
-> **WARNING**:  <version> is the CPLEX Studio version
-
-* Go to Project Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions and add:
+> **WARNING**: <version> is the CPLEX Studio version
+* Go to Configuration Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions and add:
 ```sh
 WIN32
 _CONSOLE
 IL_STD
 _CRT_SECURE_NO_WARNINGS
 ```
-
+* Click *Apply* and *Ok*
 10. Run the application:
 ```sh
 bin/Release/optlib.exe {options}
+```
+Or
+```sh
+bin/x64/optlib.exe {options}
 ```
 
 *Options*
