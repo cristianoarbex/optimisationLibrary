@@ -75,9 +75,45 @@ cmake ..
 ~/build/bin/Release/
 ```
 
-9. Run the application:
+9. If the cmake's log shows some error, configure it in the visual studio:
+* Go to *Build -> Configuration Manager* and in *Active soluction platform* select *<New...>*.
+* Fill:
+```sh
+Type or select the new platform = x64
+Copy settings from: <Empty>
+```
+* Click *Ok*
+* Select *x64* as the active solution and select *optlib* and *ZERO_CHECK*
+* Click *Close*
+* Right click in the project *optlib*, then *Properties*
+* Go to Configuration Properties -> C/C++ -> General -> Additional Include Directories and add:
+```sh
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\include
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\concert\include
+```
+> **WARNING**: <version> is the CPLEX Studio version
+* Go to Configuration Properties -> Linker -> Input -> Additional Dependencies and add:
+```sh
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\lib\x64_windows_msvc14\stat_mda\cplex<version>.lib
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\lib\x64_windows_msvc14\stat_mda\ilocplex.lib
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\concert\lib\x64_windows_msvc14\stat_mda\concert.lib
+```
+> **WARNING**: <version> is the CPLEX Studio version
+* Go to Configuration Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions and add:
+```sh
+WIN32
+_CONSOLE
+IL_STD
+_CRT_SECURE_NO_WARNINGS
+```
+* Click *Apply* and *Ok*
+10. Run the application:
 ```sh
 bin/Release/optlib.exe {options}
+```
+Or
+```sh
+x64/Release/optlib.exe {options}
 ```
 
 *Options*
@@ -133,6 +169,10 @@ bin/Release/optlib.exe --input=aaa  --debug=1
 bin/Release/optlib.exe --input=aaa --export_model=1
 ```
 
+```sh
+bin/Release/optlib.exe --input=aaa --model=motivating
+```
+
 > **WARNING**: The input parameter is mandatory
 
 ### How to debug
@@ -151,8 +191,44 @@ The following steps must be followed:
 
 5. Click in *Local Windows Debugger*.
 
+6. If the cmake's log shows some error, configure it in the visual studio:
+* Go to *Build -> Configuration Manager*.
+
+* Select *x64* as the active solution and select *optlib* and *ZERO_CHECK*
+
+* Click *Close*
+
+* Right click in the project *optlib*, then *Properties*
+
+* Go to Configuration Properties -> C/C++ -> General -> Additional Include Directories and add:
+```sh
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\include
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\concert\include
+```
+> **WARNING**: <version> is the CPLEX Studio version
+
+* Go to Configuration Properties -> Linker -> Input -> Additional Dependencies and add:
+```sh
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\lib\x64_windows_msvc14\stat_mda\cplex<version>.lib
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\cplex\lib\x64_windows_msvc14\stat_mda\ilocplex.lib
+C:\Program Files\IBM\ILOG\CPLEX_Studio<version>\concert\lib\x64_windows_msvc14\stat_mda\concert.lib
+```
+> **WARNING**: <version> is the CPLEX Studio version
+
+* Go to Configuration Properties -> C/C++ -> Preprocessor -> Preprocessor Definitions and add:
+```sh
+WIN32
+_CONSOLE
+IL_STD
+_CRT_SECURE_NO_WARNINGS
+```
+
+* Click *Apply* and *Ok*
+
+7. Click in *Local Windows Debugger*.
 
 ### TODO list
 
 1. Adapt this documentation for the differences between compiling in Linux and Windows.
 2. Make sure the library works with CPLEX 20+ in both Linux and Windows.
+3. Make an user guide to add models.
