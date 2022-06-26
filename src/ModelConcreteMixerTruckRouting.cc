@@ -276,62 +276,229 @@ void ModelConcreteMixerTruckRouting::assignWarmStart(const Data* data) {
 }
 
 // Cutting planes
-
 vector<SolverCut> ModelConcreteMixerTruckRouting::separationAlgorithm(vector<double> sol) {
     vector<SolverCut> cuts;
-    bool routeIsConnected;
-
-    for (int k = 0; k < K; k++) {
-
-        routeIsConnected = graphIsConnected(k);
-
-        if (!routeIsConnected) {
-            SolverCut cut;
-            for (int i = 1; i < V; i++) {
-                for (int j = 1; j < V; j++) {
-                    if (i != j) {
-                        double currentSolIndex = solver->getColIndex(x + lex(k) + UND + lex(i) + UND + lex(j));
-                        if (sol[currentSolIndex] == 1) {
-                            cut.addCoef(currentSolIndex, 1);
-                        }
-                    }
-                }
-            }
-
-            if (cut.getCoefs().size() > 1) {
-                cut.setName("cut1g_" + lex(k));
-                cut.setSense('L');
-                cut.setRHS(cut.getCoefs().size() - 1);
-                cuts.push_back(cut);
-            }
-        }
-    }
-    
+    connectivityCuts(sol, cuts);
     return cuts;
 }
 
-void ModelConcreteMixerTruckRouting::traverseGraph(int vehicleId, int vertex, vector<bool> visited) {
-    visited[vertex] = true; //mark as visited
-    for (int v = 0; v < V; v++) {
-        if (sol_x[vehicleId][vertex][v] == 1) {
-            if (!visited[v])
-                traverseGraph(vehicleId, v, visited);
+void ModelConcreteMixerTruckRouting::connectivityCuts(const vector<double> &sol, vector<SolverCut> &cuts) {
+
+    vector<int> newIndicesToOld; // mapeamento do grafo novo para o original (dados do grafo original)
+    vector<int> oldIndicesToNew(V); // mapeamento do grafo original para o novo (dados do grafo novo)
+    newIndicesToOld.reserve(V);
+
+    vector<vector<double>> sol_x_red; // solucões de x avaliadas
+    vector<vector<int> >   graph_red; // índices avaliados
+    sol_x_red.reserve(V);
+    graph_red.reserve(V);
+    
+    for (int k = 0; k < K; k++) {
+        int addCuts = 0;
+        
+        //////////////////////////////////////////////////////////////////////////////
+        // Creating subgraph containing only visited vertices and visited edges
+        //
+        // Reduce graph to contain only those vertices and edges with values on them
+        // Map original indices to new
+        // Map new indices to original
+        // Create list of vertices in sol_y or something
+        // Create graph (edges)
+        // Create capacity graph (sol_x or something)
+        double tempTime = Util::getWallTime();
+        int currentIndex = 0;
+        sol_x_red.clear();
+        graph_red.clear();
+        newIndicesToOld.clear();
+        std::fill(oldIndicesToNew.begin(), oldIndicesToNew.end(), -1);
+
+        // criação da estrutura do novo grafo
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                if (i != j) {
+                    double x_temp = sol[solver->getColIndex(x + lex(k) + UND + lex(i) + UND + lex(j))];
+                    if (round(x_temp) == 1) {
+                        newIndicesToOld.push_back(i);
+                        sol_x_red.push_back(vector<double>());
+                        graph_red.push_back(vector<int>());
+                        sol_x_red[currentIndex].reserve(V);
+                        graph_red[currentIndex].reserve(V);
+                        oldIndicesToNew[i] = currentIndex;
+                        currentIndex++;
+                    }
+                }
+            }
         }
+        // preenchimento do novo grafo
+        for (unsigned i = 0; i < sol_x_red.size(); i++) {
+            int ii = newIndicesToOld[i];
+            for (int j = 0; j < newIndicesToOld.size(); j++) {
+                int jj = newIndicesToOld[j];
+                if (oldIndicesToNew[jj] != -1 && ii != jj) {
+                    double x_temp = sol[solver->getColIndex(x + lex(k) + UND + lex(ii) + UND + lex(jj))];
+                    if (round(x_temp) == 1) {
+                        graph_red[i].push_back(oldIndicesToNew[jj]); 
+                        sol_x_red[i].push_back(x_temp);
+                    }
+                }
+            }
+        }
+        // END OF Creating subgraph containing only visited vertices and visited edges
+        //////////////////////////////////////////////////////////////////////////////
+
+        vector<vector<int>> verticesInCut(1);
+        
+        if (graph_red.size() == 0) {
+            continue;
+        }
+
+        // Check if cut is connected
+        tempTime = Util::getWallTime();
+        int disconnectedCuts = 2;
+
+        if (!addCuts) {
+            // verificação se o novo grafo possui o índice zero, ou seja, se passa pelo depósito
+            if (std::find(std::begin(newIndicesToOld), std::end(newIndicesToOld), 0) == std::end(newIndicesToOld)) {
+                addCuts = 1;
+                for (int i = 0; i < oldIndicesToNew.size(); i++) {
+                    if (oldIndicesToNew[i] != -1)
+                        verticesInCut[0].push_back(oldIndicesToNew[i]);
+                }
+            }
+            // verificação se o novo grafo é conectado
+            else if (disconnectedCuts == 0 || disconnectedCuts == 2) {
+                // retorna listas de vertices que não estão conectados ao primeiro grupo de vertices
+                addCuts = !isConnected(graph_red, sol_x_red, verticesInCut[0]);
+                if (addCuts && disconnectedCuts == 2) {
+                    vector<vector<int>> verticesInCut2;
+                    // retorna listas de vertices que não foram visitados partindo do 0
+                    addCuts = disconnectedComponents(graph_red, sol_x_red, verticesInCut2);
+                    if (verticesInCut2.size() > 1) {
+                        verticesInCut.resize(verticesInCut2.size()+1);
+                        for (unsigned k = 1; k < verticesInCut.size(); k++) verticesInCut[k] = verticesInCut2[k-1];
+                    }
+                }
+            } else {
+                addCuts = disconnectedComponents(graph_red, sol_x_red, verticesInCut);
+            } 
+        }
+
+        if (addCuts) {
+            // criação dos cutting planes
+            for (int i = 0; i < verticesInCut.size(); i++) {
+                SolverCut cut;
+                for (int j = 1; j < verticesInCut[i].size(); j++) {
+                    if (newIndicesToOld[verticesInCut[i][j - 1]] != newIndicesToOld[verticesInCut[i][j]]) {
+                        // x_(j-1)_j
+                        int jj = solver->getColIndex(x + lex(k) + UND + lex(newIndicesToOld[verticesInCut[i][j - 1]]) + UND + lex(newIndicesToOld[verticesInCut[i][j]]));
+                        if (round(sol[jj]) == 1)
+                            cut.addCoef(jj, 1);
+
+                        // x_j_(j-1)
+                        jj = solver->getColIndex(x + lex(k) + UND + lex(newIndicesToOld[verticesInCut[i][j]]) + UND + lex(newIndicesToOld[verticesInCut[i][j - 1]]));
+                        if (round(sol[jj]) == 1)
+                            cut.addCoef(jj, 1);
+                    }
+                }
+
+                if (cut.getCoefs().size() > 0) {
+                    cut.setName("cut1g_" + lex(k));
+                    cut.setSense('L');
+                    cut.setRHS(cut.getCoefs().size() - 1);
+                    cuts.push_back(cut);
+                }
+            }
+        }
+        
+        bfsTime += (Util::getWallTime() - tempTime);
     }
 }
 
-bool ModelConcreteMixerTruckRouting::graphIsConnected(int vehicleIndex) { // passar alreadyVisited como parametro
-    vector<bool> alreadyVisited;
-    alreadyVisited.resize(V);
-    //for all vertex as start point, check whether all nodes are visible or not
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++)
-            alreadyVisited[j] = false; //initialize as no node is visited
-        traverseGraph(vehicleIndex, i, alreadyVisited);
-        for (int j = 0; j < V; j++) {
-            if (!alreadyVisited[i]) //if there is a node, not visited by traversal, graph is not connected
-                return false;
+int ModelConcreteMixerTruckRouting::isConnected(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<int> &notConnected) { 
+    notConnected.resize(graph.size());
+    std::fill(notConnected.begin(), notConnected.end(), 1);
+    vector<int> visitQueue(1);
+    visitQueue[0] = 0;
+    notConnected[0] = 0;
+
+    while (visitQueue.size() > 0) {
+        int i = visitQueue[0];
+        for (int j = 0; j < (int)graph[i].size(); j++) {
+            int jj = graph[i][j];
+            if (round(distance[i][j]) == 1) {
+                 if (notConnected[jj] == 1) {
+                    visitQueue.push_back(jj);
+                    notConnected[jj] = 0;
+                 }
+            }
+        }
+        visitQueue.erase(visitQueue.begin());
+    }
+
+    int numDisconnected = 0;
+    
+    for (unsigned i = 0; i < notConnected.size(); i++) {
+        if (notConnected[i] == 1) {
+            notConnected[numDisconnected] = i;
+            numDisconnected++;
         }
     }
-    return true;
+
+    notConnected.resize(numDisconnected);
+    return numDisconnected == 0;
+}
+
+int ModelConcreteMixerTruckRouting::disconnectedComponents(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<vector<int>> &components) { 
+    if (graph.size() == 0) return 0;        
+
+    components.resize(1);
+    vector<int> visited(graph.size());
+    std::fill(visited.begin()+1, visited.end(), 0);
+
+    int verticesLeft = (int) graph.size();
+    int minIndexLeft = 0;
+    int currentComponent = 0;
+
+    while (minIndexLeft != -1) {
+        components[currentComponent].reserve(verticesLeft);
+        vector<int> visitQueue(1);
+
+        visitQueue[0] = minIndexLeft;
+        components[currentComponent].push_back(minIndexLeft);
+        visited[minIndexLeft] = 1;
+        verticesLeft--;
+ 
+        while (visitQueue.size() > 0) {
+            int i = visitQueue[0];
+            for (int j = 0; j < (int)graph[i].size(); j++) {
+                int jj = graph[i][j];
+                if (visited[jj] == 0) {
+                    visitQueue.push_back(jj);
+                    components[currentComponent].push_back(jj);
+                    visited[jj] = 1;
+                    verticesLeft--;
+                }
+            }
+            visitQueue.erase(visitQueue.begin());
+        }
+       
+        int found = 0;
+        for (unsigned i = minIndexLeft + 1; i < graph.size(); i++) {
+            if (visited[i] == 0) {
+                minIndexLeft = i;
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            minIndexLeft = -1;
+        } else {
+            currentComponent++;
+            components.resize(components.size()+1);
+        }
+
+    }
+
+    components.erase(components.begin());
+    return components.size();
 }

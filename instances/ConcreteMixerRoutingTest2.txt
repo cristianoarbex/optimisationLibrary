@@ -2,7 +2,7 @@ number of constructions
 4
 
 concrete mixer truck fleet
-1
+2
 
 number of types of concrete
 1

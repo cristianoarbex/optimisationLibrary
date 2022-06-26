@@ -26,8 +26,9 @@ class ModelConcreteMixerTruckRouting : public Model {
         
         void printSolutionVariables(int digits = 5, int decimals = 2);
         vector<SolverCut> separationAlgorithm(vector<double> sol);
-        void traverseGraph(int vehicleId, int vertex, vector<bool> visited);
-        bool graphIsConnected(int vehicleIndex);
+        void connectivityCuts(const vector<double> &sol, vector<SolverCut> &cuts);
+        int disconnectedComponents(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<vector<int>> &components);
+        int isConnected(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<int> &notConnected);
         
     public:
         
