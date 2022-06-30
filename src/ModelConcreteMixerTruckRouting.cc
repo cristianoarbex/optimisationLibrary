@@ -51,10 +51,10 @@ void ModelConcreteMixerTruckRouting::printSolutionVariables(int digits, int deci
                 for (int i = 0; i < V; i++) {
                     printf("X%dj", i);
                     for (int j = 0; j < V; j++) {
-                        if(i == j)
+                        if(i == j || round(sol_x[k][i][j]) == -0)
                             printf("\t 0");
                         else
-                            printf("\t %.0f", sol_x[k][i][j]);
+                            printf("\t %.0f", round(sol_x[k][i][j]));
 
                         if(round(sol_x[k][i][j]) == 1) {
                             route[indexRoute] = "(" + lex(i) + ", " + lex(j) + ") "; 
@@ -271,9 +271,7 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
     }
 }
 
-void ModelConcreteMixerTruckRouting::assignWarmStart(const Data* data) {
-   
-}
+void ModelConcreteMixerTruckRouting::assignWarmStart(const Data* data) { }
 
 // Cutting planes
 vector<SolverCut> ModelConcreteMixerTruckRouting::separationAlgorithm(vector<double> sol) {
@@ -354,7 +352,6 @@ void ModelConcreteMixerTruckRouting::connectivityCuts(const vector<double> &sol,
 
         // Check if cut is connected
         tempTime = Util::getWallTime();
-        int disconnectedCuts = 2;
 
         if (!addCuts) {
             // verificação se o novo grafo possui o índice zero, ou seja, se passa pelo depósito
@@ -366,21 +363,19 @@ void ModelConcreteMixerTruckRouting::connectivityCuts(const vector<double> &sol,
                 }
             }
             // verificação se o novo grafo é conectado
-            else if (disconnectedCuts == 0 || disconnectedCuts == 2) {
-                // retorna listas de vertices que não estão conectados ao primeiro grupo de vertices
+            else {
+                // retorna listas de vertices que não estão conectados ao primeiro grupo de vertices (encontra uma lista de vertices desconectados)
                 addCuts = !isConnected(graph_red, sol_x_red, verticesInCut[0]);
-                if (addCuts && disconnectedCuts == 2) {
+                if (addCuts) {
                     vector<vector<int>> verticesInCut2;
-                    // retorna listas de vertices que não foram visitados partindo do 0
+                    // retorna listas de vertices que não foram visitados partindo do 0 (encontra tadas as listas de vertices desconectados)
                     addCuts = disconnectedComponents(graph_red, sol_x_red, verticesInCut2);
                     if (verticesInCut2.size() > 1) {
                         verticesInCut.resize(verticesInCut2.size()+1);
                         for (unsigned k = 1; k < verticesInCut.size(); k++) verticesInCut[k] = verticesInCut2[k-1];
                     }
                 }
-            } else {
-                addCuts = disconnectedComponents(graph_red, sol_x_red, verticesInCut);
-            } 
+            }
         }
 
         if (addCuts) {
