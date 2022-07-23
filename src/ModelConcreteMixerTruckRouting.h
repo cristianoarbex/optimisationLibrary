@@ -12,12 +12,14 @@ class ModelConcreteMixerTruckRouting : public Model {
         // Variable names
         string x;
         string y;
+        string z;
         
         // Solution values
         int V;
         int K;
         vector<vector<vector<double>>> sol_x;
         vector<double> sol_y;
+        vector<vector<double>> sol_z;
 
         virtual void reserveSolutionSpace(const Data* data);
         virtual void readSolution        (const Data* data);

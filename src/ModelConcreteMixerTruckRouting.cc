@@ -8,6 +8,7 @@ ModelConcreteMixerTruckRouting::ModelConcreteMixerTruckRouting() : Model(){
     K = 0;
     x = "x";
     y = "y";
+    z = "z";
 }
 
 ModelConcreteMixerTruckRouting::~ModelConcreteMixerTruckRouting() {
@@ -73,7 +74,16 @@ void ModelConcreteMixerTruckRouting::printSolutionVariables(int digits, int deci
             }
             printf("\n");
             for (int k = 0; k < K; k++) {
-                printf("y%d: %.0f\n", k, sol_y[k]);
+                if (round(sol_y[k]) == -0)
+                    printf("y%d: 0\n", k);
+                else
+                    printf("y%d: %.0f\n", k, round(sol_y[k]));
+            }
+            printf("\n");
+            for (int k = 0; k < K; k++) {
+                for (int j = 1; j < V; j++) {
+                    printf("z%d%d: %f\n", k, j, sol_z[k][j]);
+                }
             }
         }
     }
@@ -83,6 +93,7 @@ void ModelConcreteMixerTruckRouting::printSolutionVariables(int digits, int deci
 void ModelConcreteMixerTruckRouting::reserveSolutionSpace(const Data* data) {
     sol_x.resize(K,vector<vector<double>>(V, vector<double>(V)));
     sol_y.resize(K);
+    sol_z.resize(K, vector<double>(V));
 }
 
 void ModelConcreteMixerTruckRouting::readSolution(const Data* data) {
@@ -109,6 +120,12 @@ void ModelConcreteMixerTruckRouting::readSolution(const Data* data) {
         for (int k = 0; k < K; k++) {
             sol_y[k] = solver->getColValue(y + lex(k));
         }
+
+        for (int k = 0; k < K; k++) {
+            for (int j = 1; j < V; j++) {
+                sol_z[k][j] = solver->getColValue(z + lex(k) + UND  + lex(j));
+            }
+        }
     }
 }
 
@@ -134,6 +151,12 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
     for (int k = 0; k < K; k++)
         solver->addBinaryVariable(dataCMR->getFixedCost(), y + lex(k));
 
+    // z variable
+    for (int k = 0; k < K; k++) {
+        for (int j = 1; j < V; j++) {
+            solver->addVariable(0, 1, 1, z + lex(k) + UND + lex(j));
+        }
+    }
 
     vector<string> colNames;
     vector<double> elements;
@@ -237,25 +260,58 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
     }
 
     // capacity constraint (1h)
-    colNames.resize(V * V - V);
-    elements.resize(V * V - V);
+    colNames.resize(V - 1);
+    elements.resize(V - 1);
     for (int k = 0; k < K; k++) {
         indexAux = 0;
 
-        for (int j = 0; j < V; j++) {
-            for (int i = 0; i < V; i++) {
-                if (i != j) {
-                    colNames[indexAux] = x + lex(k) + UND + lex(i) + UND + lex(j);
-                    elements[indexAux] = dataCMR->getDemand(j).getQuantity(dataCMR->getDemand(j).constructionId);
-                    indexAux++;
-                }
-            }
+        for (int j = 1; j < V; j++) {
+            colNames[indexAux] = z + lex(k) + UND + lex(j);
+            elements[indexAux] = dataCMR->getDemand(j).getQuantity(dataCMR->getDemand(j).constructionId);
+            indexAux++;
         }
 
         solver->addRow(colNames, elements, dataCMR->getConcreteMixerTruckCapacity(), 'L', "constraint1h_" + lex(k));
     }
 
-    // concrete type constraint (1j) 
+    // total percentage constraint (1i)
+    colNames.resize(K);
+    elements.resize(K);
+    for (int j = 1; j < V; j++) {
+        indexAux = 0;
+
+        for (int k = 0; k < K; k++) {
+            colNames[indexAux] = z + lex(k) + UND + lex(j);
+            elements[indexAux] = 1;
+            indexAux++;
+        }
+
+        solver->addRow(colNames, elements, 1, 'E', "constraint1i_" + lex(j));
+    }
+
+    // relationship between x and z (1j)
+    colNames.resize(V);
+    elements.resize(V);
+    for (int k = 0; k < K; k++) {
+        for (int j = 1; j < V; j++) {
+            indexAux = 0;
+
+            for (int i = 0; i < V; i++) {
+                if (i != j) {
+                    colNames[indexAux] = x + lex(k) + UND + lex(i) + UND + lex(j);
+                    elements[indexAux] = 1;
+                    indexAux++;
+                }
+            }
+
+            colNames[indexAux] = z + lex(k) + UND + lex(j);
+            elements[indexAux] = -1;
+
+            solver->addRow(colNames, elements, 0, 'G', "constraint1j_" + lex(k) + UND + lex(j));
+        }
+    }
+
+    // concrete type constraint (1l) 
     colNames.resize(1);
     elements.resize(1);
     for (int k = 0; k < K; k++) {
@@ -264,7 +320,7 @@ void ModelConcreteMixerTruckRouting::createModel(const Data* data) {
                 if (i != j && dataCMR->getDemand(i).getConcreteTypeId(dataCMR->getDemand(i).constructionId) != dataCMR->getDemand(j).getConcreteTypeId(dataCMR->getDemand(j).constructionId)) {
                     colNames[0] = x + lex(k) + UND + lex(i) + UND + lex(j);
                     elements[0] = 1;
-                    solver->addRow(colNames, elements, 0, 'E', "constraint1j_" + lex(k) + UND + lex(i) + UND + lex(j));
+                    solver->addRow(colNames, elements, 0, 'E', "constraint1l_" + lex(k) + UND + lex(i) + UND + lex(j));
                 }
             }
         }
