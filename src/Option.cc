@@ -7,9 +7,6 @@
  */
 
 #include "Option.h"
-//#include <boost/algorithm/string.hpp>
-//#include <boost/algorithm/string/join.hpp>
-//#include <boost/regex.hpp>
 
 inline bool isInteger(const std::string & s) {
    if(s.empty() || ((!isdigit(s[0])) && (s[0] != '-') && (s[0] != '+'))) return false ;
@@ -50,9 +47,8 @@ BoolOption::~BoolOption() {
 }
 
 void BoolOption::checkOption(string str, string optionName) {
-    //if (!boost::regex_search(str.c_str(), boost::regex("^[01]$"))) {
     if (str.compare("0") != 0 && str.compare("1") != 0) {
-        Util::throwInvalidArgument(
+        Util::stop(
                         "Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
     }
     value = atoi(str.c_str()) ? true : false;
@@ -82,14 +78,13 @@ IntOption::~IntOption() {
 }
 
 void IntOption::checkOption(string str, string optionName) {
-    //if (!boost::regex_search(str.c_str(), boost::regex("^-?[0-9][0-9]*$"))) {
     if (!isInteger(str)) {
-        Util::throwInvalidArgument("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
+        Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
     }
 
     value = atoi(str.c_str());
     if (value > max || value < min) {
-        Util::throwInvalidArgument("Error: Option %s is out of range (%d, min=%d, max=%d).", optionName.c_str(), value, min, max);
+        Util::stop("Error: Option %s is out of range (%d, min=%d, max=%d).", optionName.c_str(), value, min, max);
     }
 }
 
@@ -119,11 +114,11 @@ DoubleOption::~DoubleOption() {
 
 void DoubleOption::checkOption(string str, string optionName) {
     if (Util::stringToDouble(str, value) != 0) {
-        Util::throwInvalidArgument("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
+        Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
     }
 
     if (value > max || value < min) {
-        Util::throwInvalidArgument("Error: Option %s is out of range (%f, min=%f, max=%f).", optionName.c_str(), value, min, max);
+        Util::stop("Error: Option %s is out of range (%f, min=%f, max=%f).", optionName.c_str(), value, min, max);
     }
 }
 
@@ -163,9 +158,8 @@ void StringOption::checkOption(string str, string optionName) {
     } else found = true;
 
     if (!found) {
-        //string joined = boost::algorithm::join(possibleValues, ", ");
         string joined = Util::join(possibleValues, ", ");
-        Util::throwInvalidArgument("Error: Option %s has invalid value (%s). Possible values are (%s).", optionName.c_str(), str.c_str(), joined.c_str());
+        Util::stop("Error: Option %s has invalid value (%s). Possible values are (%s).", optionName.c_str(), str.c_str(), joined.c_str());
     }
     value = str;
 }
@@ -182,9 +176,11 @@ bool StringOption::wasChanged() {
 // ARRAY OPTION  //
 ///////////////////
 
-ArrayOption::ArrayOption(string name, string description, bool showOutput) : Option(name, description, showOutput) {
+ArrayOption::ArrayOption(string name, string description, bool showOutput, int max, int min) : Option(name, description, showOutput) {
     this->defaultValue.resize(0);
     this->value = this->defaultValue;
+    this->max = max;
+    this->min = min;
 }
 
 ArrayOption::~ArrayOption() {
@@ -195,19 +191,13 @@ void ArrayOption::checkOption(string str, string optionName) {
 
     if (str.empty()) return;
 
-    //vector<string> temp;
-    //boost::split(temp, str, boost::is_any_of(","));
     vector<string> temp = Util::split(str, ",");
 
     for (unsigned i = 0; i < temp.size(); i++) {
-//#ifdef _WIN32
-        if (!isInteger(temp[i])) {
-//#else
-//        if (!boost::regex_search(temp[i].c_str(), boost::regex("^-?[0-9][0-9]*$"))) {
-//#endif
-            Util::throwInvalidArgument("Error: Option %s has invalid value (%s).", optionName.c_str(), temp[i].c_str());
-        }
+        if (!isInteger(temp[i])) Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), temp[i].c_str());
         value.push_back(atoi(temp[i].c_str()));
+        if (value[value.size()-1] < min) Util::stop("In ArrayOption %s, the minimum value is %d.", optionName.c_str(), min);
+        if (value[value.size()-1] > max) Util::stop("In ArrayOption %s, the maximum value is %d.", optionName.c_str(), max);
     }
 
 }
@@ -229,9 +219,11 @@ bool ArrayOption::wasChanged() {
 // DOUBLE ARRAY OPTION  //
 //////////////////////////
 
-DoubleArrayOption::DoubleArrayOption(string name, string description, bool showOutput) : Option(name, description, showOutput) {
+DoubleArrayOption::DoubleArrayOption(string name, string description, bool showOutput, double max, double min) : Option(name, description, showOutput) {
     this->defaultValue.resize(0);
     this->value = this->defaultValue;
+    this->max = max;
+    this->min = min;
 }
 
 DoubleArrayOption::~DoubleArrayOption() {
@@ -241,17 +233,17 @@ DoubleArrayOption::~DoubleArrayOption() {
 void DoubleArrayOption::checkOption(string str, string optionName) {
 
     if (str.empty()) return;
-    //vector<string> temp;
-    //boost::split(temp, str, boost::is_any_of(","));
     vector<string> temp = Util::split(str, ",");
     
     for (unsigned i = 0; i < temp.size(); i++) {
         double val = 0;
         if (Util::stringToDouble(temp[i], val) != 0)
-            Util::throwInvalidArgument("Error: Option %s has invalid value (%s).", optionName.c_str(), temp[i].c_str());
+            Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), temp[i].c_str());
         value.push_back(val);
+        if (value[value.size()-1] < min) Util::stop("In DoubleArrayOption %s, the minimum value is %g.", optionName.c_str(), min);
+        if (value[value.size()-1] > max) Util::stop("In DoubleArrayOption %s, the maximum value is %g.", optionName.c_str(), max);
     }
-
+    
 }
 
 string DoubleArrayOption::getValueAsString() {
@@ -274,36 +266,32 @@ bool DoubleArrayOption::wasChanged() {
 // MATRIX OPTION //
 ///////////////////
 
-MatrixOption::MatrixOption(string name, string description, bool showOutput) : Option(name, description, showOutput) {
+MatrixOption::MatrixOption(string name, string description, bool showOutput, int max, int min) : Option(name, description, showOutput) {
     this->defaultValue.resize(0);
     this->value = this->defaultValue;
+    this->max = max;
+    this->min = min;
 }
 
 MatrixOption::~MatrixOption() {
 
 }
 
-// TODO Checks
-//  Only positive numbers allowed?
-//  Repeated numbers allowed?
-
 void MatrixOption::checkOption(string str, string optionName) {
 
     if (str.empty()) return;
 
-    //vector<string> temp;
-    //boost::split(temp, str, boost::is_any_of(":"));
     vector<string> temp = Util::split(str, ":");
 
     for (unsigned i = 0; i < temp.size(); i++) {
-        //vector<string> temp2;
-        //boost::split(temp2, temp[i], boost::is_any_of(","));
         vector<string> temp2 = Util::split(temp[i], ",");
 
         value.push_back(vector<int>());
         for (unsigned j = 0; j < temp2.size(); j++) {
-            if (!isInteger(temp2[j])) Util::throwInvalidArgument("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
+            if (!isInteger(temp2[j])) Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
             value[i].push_back(atoi(temp2[j].c_str()));
+            if (value[i][value.size()-1] < min) Util::stop("In MatrixOption %s, the minimum value is %d.", optionName.c_str(), min);
+            if (value[i][value.size()-1] > max) Util::stop("In MatrixOption %s, the maximum value is %d.", optionName.c_str(), max);
         }
     }
 
@@ -327,5 +315,61 @@ string MatrixOption::getValueAsString() {
 bool MatrixOption::wasChanged() {
     return value.size() != 0;
 }
+
+
+//////////////////////////
+// DOUBLE MATRIX OPTION //
+/////////////////////////
+
+DoubleMatrixOption::DoubleMatrixOption(string name, string description, bool showOutput, double max, double min) : Option(name, description, showOutput) {
+    this->defaultValue.resize(0);
+    this->value = this->defaultValue;
+    this->max = max;
+    this->min = min;
+}
+
+DoubleMatrixOption::~DoubleMatrixOption() {
+
+}
+
+void DoubleMatrixOption::checkOption(string str, string optionName) {
+
+    if (str.empty()) return;
+
+    vector<string> temp = Util::split(str, ":");
+
+    for (unsigned i = 0; i < temp.size(); i++) {
+        vector<string> temp2 = Util::split(temp[i], ",");
+
+        value.push_back(vector<double>());
+        for (unsigned j = 0; j < temp2.size(); j++) {
+            if (!isInteger(temp2[j])) Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
+            value[i].push_back(atoi(temp2[j].c_str()));
+            if (value[i][value.size()-1] < min) Util::stop("In DoubleMatrixOption %s, the minimum value is %g.", optionName.c_str(), min);
+            if (value[i][value.size()-1] > max) Util::stop("In DoubleMatrixOption %s, the maximum value is %g.", optionName.c_str(), max);
+        }
+    }
+
+    //printf("Size of matrix: %d\n", (int)value.size());
+    //Util::printIntMatrix(value);
+
+}
+
+string DoubleMatrixOption::getValueAsString() {
+    string temp = "";
+    for (unsigned i = 0; i < value.size(); i++) {
+        for (unsigned j = 0; j < value[i].size(); j++) {
+            temp = temp + lex(value[i][j]);
+            if (j < value[i].size()-1) temp = temp + ",";
+        }
+        if (i < value.size()-1) temp = temp + ":";
+    }
+    return temp;
+}
+
+bool DoubleMatrixOption::wasChanged() {
+    return value.size() != 0;
+}
+
 
 

@@ -117,10 +117,12 @@ class ArrayOption : public Option {
         
         vector<int> defaultValue;
         vector<int> value;
+        int min;
+        int max;
 
     public:
 
-        ArrayOption(string name, string description, bool showOutput);
+        ArrayOption(string name, string description, bool showOutput, int max, int min);
         ~ArrayOption();
         virtual void checkOption(string str, string optionName);
         virtual bool wasChanged();
@@ -134,10 +136,12 @@ class DoubleArrayOption : public Option {
         
         vector<double> defaultValue;
         vector<double> value;
+        double min;
+        double max;
 
     public:
 
-        DoubleArrayOption(string name, string description, bool showOutput);
+        DoubleArrayOption(string name, string description, bool showOutput, double max, double min);
         ~DoubleArrayOption();
         virtual void checkOption(string str, string optionName);
         virtual bool wasChanged();
@@ -154,15 +158,36 @@ class MatrixOption : public Option {
         
         vector<vector<int>> defaultValue;
         vector<vector<int>> value;
+        int min;
+        int max;
 
     public:
 
-        MatrixOption(string name, string description, bool showOutput);
+        MatrixOption(string name, string description, bool showOutput, int max, int min);
         ~MatrixOption();
         virtual void checkOption(string str, string optionName);
         virtual bool wasChanged();
         virtual string getValueAsString();
         vector<vector<int>> getValue() { return value; }
+};
+
+class DoubleMatrixOption : public Option {
+
+    private:
+        
+        vector<vector<double>> defaultValue;
+        vector<vector<double>> value;
+        double min;
+        double max;
+
+    public:
+
+        DoubleMatrixOption(string name, string description, bool showOutput, double max, double min);
+        ~DoubleMatrixOption();
+        virtual void checkOption(string str, string optionName);
+        virtual bool wasChanged();
+        virtual string getValueAsString();
+        vector<vector<double>> getValue() { return value; }
 };
 
 

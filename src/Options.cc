@@ -7,9 +7,6 @@
  */
 
 #include "Options.h"
-//#include <boost/algorithm/string.hpp>
-//#include <boost/algorithm/string/join.hpp>
-//#include <boost/regex.hpp>
 
 /**
  * INITIAL METHODS
@@ -212,6 +209,16 @@ vector<vector<int>> Options::getMatrixOption(string name) {
     return vector<vector<int>>();
 }
 
+vector<vector<double>> Options::getDoubleMatrixOption(string name) {
+    if (optionsMap.find(name) != optionsMap.end()) {
+        DoubleMatrixOption* b = dynamic_cast<DoubleMatrixOption*>(options[optionsMap[name]]);
+        if (b != 0) return b->getValue();
+        else Util::stop("Error: Attempting to get double matrix from option %s which is not a double matrix option.", name.c_str());
+    } else Util::stop("Error: Attempting to get value from non-existing option %s.", name.c_str());
+    return vector<vector<double>>();
+}
+
+
 
 /////////////////////////
 /////////////////////////
@@ -308,7 +315,6 @@ void Options::readSettingsFile(string filename) {
         //printf("\n");
     }
 }
-
 
 void Options::specificChecks() {
     if (Options::getInstance()->getStringOption("input").empty()) Util::stop("Error: Input file was not provided");

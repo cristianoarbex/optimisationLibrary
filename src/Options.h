@@ -79,17 +79,17 @@ class Options {
 
 
 
-
         // get option values
-        bool                getBoolOption       (string name);
-        int                 getIntOption        (string name);
-        double              getDoubleOption     (string name);
-        string              getStringOption     (string name);
-        vector<int>         getArrayOption      (string name);
-        vector<double>      getDoubleArrayOption(string name);
-        vector<vector<int>> getMatrixOption     (string name);
-
-        bool                wasChanged          (string name);
+        bool                   getBoolOption        (string name);
+        int                    getIntOption         (string name);
+        double                 getDoubleOption      (string name);
+        string                 getStringOption      (string name);
+        vector<int>            getArrayOption       (string name);
+        vector<double>         getDoubleArrayOption (string name);
+        vector<vector<int>>    getMatrixOption      (string name);
+        vector<vector<double>> getDoubleMatrixOption(string name);
+        
+        bool                   wasChanged           (string name);
 };    
 
 #endif 
