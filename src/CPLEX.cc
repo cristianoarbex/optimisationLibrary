@@ -124,12 +124,13 @@ void CPLEX::setVariablesWarmStart(vector<string> colNames, vector<double> values
 }
 
 void CPLEX::refineMIPStart() {
-    int a1;
+    /*int a1;
     int a2;
     Check(CPXrefinemipstartconflict(env, problem, 0, &a1, &a2));
     if (a1 > 0 || a2 > 0) {
         Check(CPXclpwrite(env, problem, "cplexConflict.clp"));
-    }
+    }*/
+    Check(CPXrefinemipstartconflictext(env, problem, 0, 0, 0, NULL, NULL, NULL, NULL));
 }
 
 
