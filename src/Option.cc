@@ -249,7 +249,9 @@ void DoubleArrayOption::checkOption(string str, string optionName) {
 string DoubleArrayOption::getValueAsString() {
     string temp = "";
     for (unsigned i = 0; i < value.size(); i++) {
-        temp = temp + lex(value[i]);
+        char buffer[30];
+        sprintf(buffer, "%g", value[i]);
+        temp = temp + buffer;
         if (i < value.size()-1) temp = temp + ",";
     }
     return temp;
@@ -290,8 +292,8 @@ void MatrixOption::checkOption(string str, string optionName) {
         for (unsigned j = 0; j < temp2.size(); j++) {
             if (!isInteger(temp2[j])) Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
             value[i].push_back(atoi(temp2[j].c_str()));
-            if (value[i][value.size()-1] < min) Util::stop("In MatrixOption %s, the minimum value is %d.", optionName.c_str(), min);
-            if (value[i][value.size()-1] > max) Util::stop("In MatrixOption %s, the maximum value is %d.", optionName.c_str(), max);
+            if (value[i][value[i].size()-1] < min) Util::stop("In MatrixOption %s, the minimum value is %d.", optionName.c_str(), min);
+            if (value[i][value[i].size()-1] > max) Util::stop("In MatrixOption %s, the maximum value is %d.", optionName.c_str(), max);
         }
     }
 
@@ -345,8 +347,8 @@ void DoubleMatrixOption::checkOption(string str, string optionName) {
         for (unsigned j = 0; j < temp2.size(); j++) {
             if (!isInteger(temp2[j])) Util::stop("Error: Option %s has invalid value (%s).", optionName.c_str(), str.c_str());
             value[i].push_back(atoi(temp2[j].c_str()));
-            if (value[i][value.size()-1] < min) Util::stop("In DoubleMatrixOption %s, the minimum value is %g.", optionName.c_str(), min);
-            if (value[i][value.size()-1] > max) Util::stop("In DoubleMatrixOption %s, the maximum value is %g.", optionName.c_str(), max);
+            if (value[i][value[i].size()-1] < min) Util::stop("In DoubleMatrixOption %s, the minimum value is %g.", optionName.c_str(), min);
+            if (value[i][value[i].size()-1] > max) Util::stop("In DoubleMatrixOption %s, the maximum value is %g.", optionName.c_str(), max);
         }
     }
 
@@ -360,6 +362,9 @@ string DoubleMatrixOption::getValueAsString() {
     for (unsigned i = 0; i < value.size(); i++) {
         for (unsigned j = 0; j < value[i].size(); j++) {
             temp = temp + lex(value[i][j]);
+            char buffer[30];
+            sprintf(buffer, "%g", value[i][j]);
+            temp = temp + buffer;
             if (j < value[i].size()-1) temp = temp + ",";
         }
         if (i < value.size()-1) temp = temp + ":";
