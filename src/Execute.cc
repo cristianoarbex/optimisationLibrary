@@ -10,7 +10,14 @@
 #include "Options.h"
 #include "DataCapitalBudgeting.h"
 #include "ModelCapitalBudgeting.h"
-
+#include "DataMotivatingProblem.h"
+#include "ModelMotivatingProblem.h"
+#include "DataKnapsackProblem.h"
+#include "ModelKnapsackProblem.h"
+#include "DataAssignmentProblem.h"
+#include "ModelAssignmentProblem.h"
+#include "DataConcreteMixerTruckRouting.h"
+#include "ModelConcreteMixerTruckRouting.h"
 
 Execute::Execute() {
     totalTime = 0;
@@ -30,6 +37,18 @@ void Execute::execute() {
     if (Options::getInstance()->getStringOption("model").compare("toy") == 0) {
         data  = new DataCapitalBudgeting();
         model = new ModelCapitalBudgeting();
+    } else if (Options::getInstance()->getStringOption("model").compare("motivating") == 0) {
+        data  = new DataMotivatingProblem();
+        model = new ModelMotivatingProblem();
+    } else if (Options::getInstance()->getStringOption("model").compare("knapsackProblem") == 0) {
+        data  = new DataKnapsackProblem();
+        model = new ModelKnapsackProblem();
+    } else if (Options::getInstance()->getStringOption("model").compare("assignmentProblem") == 0) {
+        data  = new DataAssignmentProblem();
+        model = new ModelAssignmentProblem();
+    } else if (Options::getInstance()->getStringOption("model").compare("concreteMixerTruckRouting") == 0) {
+        data  = new DataConcreteMixerTruckRouting();
+        model = new ModelConcreteMixerTruckRouting();
     } else {
         data  = new Data();
         model = new Model();

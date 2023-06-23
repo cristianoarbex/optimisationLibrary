@@ -25,6 +25,18 @@ add_executable(${OPTLIB_COMPILED}
       
       DataCapitalBudgeting.h  DataCapitalBudgeting.cc
       ModelCapitalBudgeting.h ModelCapitalBudgeting.cc
+
+      DataMotivatingProblem.h  DataMotivatingProblem.cc
+      ModelMotivatingProblem.h ModelMotivatingProblem.cc
+
+      DataKnapsackProblem.h  DataKnapsackProblem.cc
+      ModelKnapsackProblem.h ModelKnapsackProblem.cc
+
+      DataAssignmentProblem.h  DataAssignmentProblem.cc
+      ModelAssignmentProblem.h ModelAssignmentProblem.cc
+
+      DataConcreteMixerTruckRouting.h  DataConcreteMixerTruckRouting.cc
+      ModelConcreteMixerTruckRouting.h  ModelConcreteMixerTruckRouting.cc
       )
 
 # Added private defininition of throw_exception to Util.h

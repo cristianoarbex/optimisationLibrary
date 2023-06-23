@@ -1,0 +1,30 @@
+number of constructions
+4
+
+concrete mixer truck fleet
+4
+
+number of types of concrete
+2
+
+fixed cost of using the concrete mixer truck
+10
+
+concrete mixer truck capacity
+8
+
+demands
+0 0 0
+1 1 0
+2 1 0
+3 10 1
+4 10 0
+
+distances
+
+0	2	4	30	35
+2	0	2	32	37
+4	2	0	33	36
+30	32	33	0	2
+35	37	36	2	0
+

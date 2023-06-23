@@ -52,6 +52,26 @@ This is the abstraction of the [Data class](#data.cc).
   * void readData(): gets the default data
   * void print(): prints the defaut data
 
+#### DataAssignmentProblem.h
+
+This is the abstraction of the [DataAssignmentProblem class](#dataassignmentproblem.cc).
+
+* Dependencies
+  * [Util.h](#util.h)
+  * [Data.h](#data.h)
+
+* Properties
+  * int numVariables: the number of decision variables
+  * vector<vector<int>> costs: the array of cost of each variable
+
+* Public functions
+  * DataAssignmentProblem(): constructor
+  * ~DataAssignmentProblem(): destructor
+  * void readData(): sets the data and parameters of the optimization problem
+  * void print(): prints the data of the optimization problem
+  * int getNumVariables(): gets the number of decision variables
+  * int getCost(int i, int j): gets the cost.
+
 #### DataCapitalBudgeting.h
 
 This is the abstraction of the [DataCapitalBudgeting class](#datacapitalbudgeting.cc).
@@ -75,6 +95,116 @@ This is the abstraction of the [DataCapitalBudgeting class](#datacapitalbudgetin
   * int getMaxInvestment(): gets the maximum investment
   * int getInitialInvestment(int i): gets the initial investment.
   * int getFutureValue(int i): gets the future value of the variable. 
+
+#### DataConcreteMixerTruckRouting.h
+
+This is the abstraction of the [DataConcreteMixerTruckRouting class](#dataconcretemixertruckrouting.cc).
+
+* Dependencies
+  * [Util.h](#util.h)
+  * [Data.h](#data.h)
+
+* Properties
+  * int numberOfConstructions: the number of constructions
+  * int concreteMixerTruckFleet: the flet of croncrete mixer trucks
+  * int numberOfTypesOfConcrete: the number of concrete types
+  * double fixedCost: the fixed cost of using the concrete mixer truck
+  * double concreteMixerTruckCapacity: the capacity of a concrete mixer truck
+  * vector<ClientDemand> demands: the list fo demands of the clients
+  * vector<vector<double>> distances: the distances between constructions matrix 
+
+* Public functions
+  * DataConcreteMixerTruckRouting(): constructor
+  * ~DataConcreteMixerTruckRouting(): destructor
+  * void readData(): sets the data and parameters of the optimization problem
+  * void print(): prints the data of the optimization problem
+  * int getNumberOfConstructions(): gets the number of constructions
+  * int getConcreteMixerTruckFleet(): gets the fleet of concrete mixer trucks
+  * int getNumberOfTypesOfConcrete(): gets the number of concrete types
+  * double getFixedCost(): gets the fixed cost of using the concrete mixer truck
+  * double getConcreteMixerTruckCapacity(): gets the capacity of the concrete mixer trucks
+  * ClientDemand getDemand(int i): gets the demnand of a client in a construction
+  * double getDistance(int i, int j): gets the distance between 2 contructions
+
+* Class ClientDemand
+This is the object that describes a demand of a client.
+
+* Properties
+  * int constructionId: the id of the construction
+  * double quantity: the quantity of concrete requested by the client in the construction 
+  * int concreteTypeId: the id of the type of concrete requested by the client in the construction 
+
+* Functions
+  * ClientDemand(): constructor
+  * ~ClientDemand(): destructor
+  * double getQuantity(int constructionId)
+    * Returns:
+      * the quantity of the client demand
+  * int getConcreteTypeId(int constructionId)
+    * Returns:
+      * the type id of the client demand
+  * void setQuantity(double value)
+    * Actions:
+      * sets the quantity of the client demand
+  * void setConcreteTypeId(int id)
+    * Actions:
+      * sets the concrete type id of the client demand  
+
+#### DataKnapsackProblem.h
+
+This is the abstraction of the [DataKnapsackProblem class](#dataknapsackproblem.cc).
+
+* Dependencies
+  * [Util.h](#util.h)
+  * [Data.h](#data.h)
+
+* Properties
+  * int numVariables: the number of decision variables
+  * vector<double> returnValues: the array of return value of each item
+  * vector<double> costs: the array with the cost of each item
+  * double capacity: the capacity
+
+* Public functions
+  * DataKnapsackProblem(): constructor
+  * ~DataKnapsackProblem(): destructor
+  * void readData(): sets the data and parameters of the optimization problem
+  * void print(): prints the data of the optimization problem
+  * int getNumVariables(): gets the number of decision variables
+  * double getCapacity(): gets the capacity
+  * double getReturnValues(int i): gets the return value.
+  * double getCost(int i): gets the cost. 
+
+  #### DataMotivatingProblem.h
+
+This is the abstraction of the [DataMotivatingProblem class](#datamotivatingproblem.cc).
+
+* Dependencies
+  * [Util.h](#util.h)
+  * [Data.h](#data.h)
+
+* Properties
+  * int numVariables: the number of decision variables
+  * vector<int> objectiveCoefficients: the array of coefficient values of each variable of the objective function
+  * vector<int> firstConstraintCoefficients: the array of coefficient values of each variable of the objective function of the first constraint
+  * vector<int> secondConstraintCoefficients: the array of coefficient values of each variable of the objective function of the second constraint
+  * vector<int> thirdConstraintCoefficients: the array of coefficient values of each variable of the objective function of the third constraint
+  * int firstConstraintMaxValue: the maximum value of the first constraint
+  * int secondConstraintMaxValue: the maximum value of the second constraint
+  * int thirdConstraintMaxValue: the maximum value of the third constraint
+
+* Public functions
+  * DataMotivatingProblem(): constructor
+  * ~DataMotivatingProblem(): destructor
+  * void readData(): sets the data and parameters of the optimization problem
+  * void print(): prints the data of the optimization problem
+  * int getNumVariables(): gets the number of decision variables
+  * int getObjectiveCoefficients(): gets the array of coefficient values of the objective function
+  * int getFirstConstraintCoefficients(int i): gets the array of coefficient values of the first constraint
+  * int getSecondConstraintCoefficients(int i): gets the array of coefficient values of the second constraint
+  * int getThirdConstraintCoefficients(int i): gets the array of coefficient values of the third constraint
+  * int getFirstConstraintMaxValue(): gets the maximum value of the first constraint
+  * int getSecondConstraintMaxValue(): gets the maximum value of the second constraint
+  * int getThirdConstraintMaxValue(): gets the maximum value of the third constraint
 
 #### Execute.h
 
@@ -184,6 +314,31 @@ This is the abstraction of the [Model class](#model.cc).
   * int shouldCaptureCuts(): defines if the system should capture cuts
   * void getExtraCuts(vector<SolverCut>& sc): gets the extra cuts
 
+#### ModelAssignmentProblem.h
+
+This is the abstraction of the [ModelAssignmentProblem class](#modelassignmentproblem.cc).
+
+* Dependencies
+  * [Model.h](#model.h)
+  * [Solution.h](#solution.h)
+
+* Properties
+  * string x: the string that describes the solution
+  * int V: the number of variables
+  * vector<vector<double>> sol_x: the value of the variables
+  
+* Private functions
+  * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
+  * void readSolution(const Data* data): gets the solution
+  * void assignWarmStart(const Data* data)
+  * void createModel(const Data* data): creates a model formatted to the solver based on the data 
+  * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+
+* Public functions
+  * ModelAssignmentProblem(): constructor
+  * ~ModelAssignmentProblem(): destructor
+  * void execute(const Data *data): executes the process of solving the Assignment problem
+
 #### ModelCapitalBudgeting.h
 
 This is the abstraction of the [ModelCapitalBudgeting class](#modelcapitalbudgeting.cc).
@@ -194,7 +349,7 @@ This is the abstraction of the [ModelCapitalBudgeting class](#modelcapitalbudget
 
 * Properties
   * string x: the string that describes the solution
-  * int V: the solution value
+  * int V: the number of variables
   * vector<double> sol_x: the value of the variables
   
 * Private functions
@@ -208,6 +363,88 @@ This is the abstraction of the [ModelCapitalBudgeting class](#modelcapitalbudget
   * ModelCapitalBudgeting(): constructor
   * ~ModelCapitalBudgeting(): destructor
   * void execute(const Data *data): executes the process of solving the Capital Budgeting problem
+
+#### ModelConcreteMixerTruckRouting.h
+
+This is the abstraction of the [ModelConcreteMixerTruckRouting class](#modelconcretemixertruckrouting.cc).
+
+* Dependencies
+  * [Model.h](#model.h)
+  * [Solution.h](#solution.h)
+
+* Properties
+  * string x: the string that describes the solution for x variable
+  * string y: the string that describes the solution for y variable
+  * int V: the number of points
+  * int K: number of concrete mixer trucks
+  * vector<vector<vector<double>>> sol_x: the matix of values of the variable x
+  * vector<double> sol_y: the vector of avalues of the variable y
+  
+* Private functions
+  * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
+  * void readSolution(const Data* data): gets the solution
+  * void assignWarmStart(const Data* data)
+  * void createModel(const Data* data): creates a model formatted to the solver based on the data 
+  * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+  * vector<SolverCut> separationAlgorithm(vector<double> sol): creates the cutting planes
+  * void connectivityCuts(const vector<double> &sol, vector<SolverCut> &cuts): analyzes the connectivity of the graph
+  * int disconnectedComponents(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<vector<int>> &components): identifies the vertexes that are disconnected from the graph
+  * int isConnected(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<int> &notConnected): verifies if the graph is connected
+
+* Public functions
+  * ModelConcreteMixerTruckRouting(): constructor
+  * ~ModelConcreteMixerTruckRouting(): destructor
+  * void execute(const Data *data): executes the process of solving the Concrete Mixer Truck Routing Problem
+
+#### ModelKnapsackProblem.h
+
+This is the abstraction of the [ModelKnapsackProblem class](#modelknapsackproblem.cc).
+
+* Dependencies
+  * [Model.h](#model.h)
+  * [Solution.h](#solution.h)
+
+* Properties
+  * string x: the string that describes the solution
+  * int V: the number of variables
+  * vector<double> sol_x: the value of the variables
+  
+* Private functions
+  * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
+  * void readSolution(const Data* data): gets the solution
+  * void assignWarmStart(const Data* data)
+  * void createModel(const Data* data): creates a model formatted to the solver based on the data 
+  * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+
+* Public functions
+  * ModelKnapsackProblem(): constructor
+  * ~ModelKnapsackProblem(): destructor
+  * void execute(const Data *data): executes the process of solving the knapsack problem
+
+#### ModelMotivatingProblem.h
+
+This is the abstraction of the [ModelMotivatingProblem class](#modelmotivatingproblem.cc).
+
+* Dependencies
+  * [Model.h](#model.h)
+  * [Solution.h](#solution.h)
+
+* Properties
+  * string x: the string that describes the solution
+  * int V: the number of variables
+  * vector<double> sol_x: the value of the variables
+  
+* Private functions
+  * void reserveSolutionSpace(const Data* data): reserves memory space to the solution
+  * void readSolution(const Data* data): gets the solution
+  * void assignWarmStart(const Data* data)
+  * void createModel(const Data* data): creates a model formatted to the solver based on the data 
+  * void printSolutionVariables(int digits = 5, int decimals = 2): prints the value of the variables in the solution
+
+* Public functions
+  * ModelCapitalBudgeting(): constructor
+  * ~ModelCapitalBudgeting(): destructor
+  * void execute(const Data *data): executes the process of solving the motivating problem
 
 #### Option.h
 
@@ -407,6 +644,11 @@ This is the abstraction of the [Util class](#util.cc).
   * static unsigned long randomLongAlexandre(unsigned long, double*): gets a random long number using bits
   * static std::vector<double> randomN(int, bool, double): gets a random double vector
 
+* Matrix functions
+  * static vector<vector<int>> transposeIntMatrix(const vector<vector<int> > &original, int xSize, int ySize): transposes an integer matrix
+  * static vector<vector<double>> transposeDoubleMatrix(const vector<vector<double> > &original, int xSize, int ySize): transposes a double matrix
+  * static vector<vector<string>> transposeStringMatrix(const vector<vector<string> > &original, int xSize, int ySize): transposes a string matrix
+
 ### Implementations
 
 #### CPLEX.cc
@@ -431,6 +673,39 @@ This class is responsible to create and manage a default data object.
     * sets debug according to the *debug* option
 * ~Data()
   * Destructor
+
+#### DataAssignmentProblem.cc
+
+This class is responsible to create and manage a data object for the Assignment problem.
+
+* Dependencies
+  * [DataAssignmentProblem.h](#dataassignmentproblem.h)
+  * [Options.h](#options.h)
+
+* DataAssignmentProblem()
+  * Constructor
+  * Actions:
+    * Sets numVariables to 0 (zero)
+* ~DataAssignmentProblem() 
+  * Destructor
+* void readData()
+  * Actions:
+    * Sets the number of variables of the Assignment problem
+    * Sets the array of costs of the Assignment problem
+* void print()
+  * Actions:
+    * Prints the number of variables and the list of costs, if the *debug* option is activated
+* int getNumVariables()
+  * Returns:
+    * The number of decision variables
+* double getCost(int i, int j)
+  * Parameters:
+    * i: index of the variable
+    * j: index of the variable
+  * Actions:
+    * Verifies if the indexes exist
+  * Returns:
+    * The cost of a variable
 
 #### DataCapitalBudgeting.cc
 
@@ -477,6 +752,154 @@ This class is responsible to create and manage a data object for the Capital Bud
   * Returns:
     * The future value of a variable
 
+#### DataConcreteMixerTruckRouting.cc
+
+This class is responsible to create and manage a data object for the Concrete Mixer Truck Routing problem.
+
+* Dependencies
+  * [DataConcreteMixerTruckRouting.h](#dataconcretemixertruckrouting.h)
+  * [Options.h](#options.h)
+
+* DataConcreteMixerTruckRouting()
+  * Constructor
+  * Actions:
+    * Sets numberOfConstructions to 0 (zero)
+    * Sets concreteMixerTruckFleet to 0 (zero)
+    * Sets numberOfTypesOfConcrete to 0 (zero)
+* ~DataConcreteMixerTruckRouting() 
+  * Destructor
+* void readData()
+  * Actions:
+    * Validade the filename of the --input option
+    * Opens the file of the option --input, taht is a .txt file
+    * Reads each character of the file e fill the variables
+    * Closes the file
+* void print()
+  * Actions:
+    * Prints all the properties, if the *debug* option is activated
+* int getDemand()
+  * Parameters:
+    * int i: the index of the demand
+  * Returns:
+    * The demand
+* int getDistance()
+  * Parameters:
+    * int i: the index of the origin constrution
+    * int j: the index of the target constrution
+  * Returns:
+    * The destance between 2 constructions
+
+#### DataKnapsackProblem.cc
+
+This class is responsible to create and manage a data object for the Knapsack Problem.
+
+* Dependencies
+  * [DataKnapsackProblem.h](#dataknapsackproblem.h)
+  * [Options.h](#options.h)
+
+* DataKnapsackProblem()
+  * Constructor
+  * Actions:
+    * Sets numVariables to 0 (zero)
+    * Sets capacity to 0 (zero)
+* ~DataKnapsackProblem() 
+  * Destructor
+* void readData()
+  * Actions:
+    * Sets the number of variables of the Knapsack problem
+    * Sets the capacity of the Knapsack problem
+    * Sets the array of return values of the Knapsack problem
+    * Sets the array of costs of the Knapsack problem
+* void print()
+  * Actions:
+    * Prints the number of variables, the capacity and the list of return values and costs, if the *debug* option is activated
+* int getNumVariables()
+  * Returns:
+    * The number of decision variables
+* double getCapacity()
+  * Returns:
+    * The capacity
+* int getReturnValue(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The return value of a variable
+* int getCost(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The cost of a variable
+
+#### DataMotivatingProblem.cc
+
+This class is responsible to create and manage a data object for the motivating problem.
+
+* Dependencies
+  * [DataMotivatingProblem.h](#datamotivatingproblem.h)
+  * [Options.h](#options.h)
+
+* DataMotivatingProblem()
+  * Constructor
+  * Actions:
+    * Sets numVariables to 0 (zero)
+    * Sets firstConstraintMaxValue to 0 (zero)
+    * Sets secondConstraintMaxValue to 0 (zero)
+    * Sets thirdConstraintMaxValue to 0 (zero)
+* ~DataMotivatingProblem() 
+  * Destructor
+* void readData()
+  * Actions:
+    * Sets the number of variables of the motivating problem
+    * Sets the maximum values of the constraints
+    * Sets the array of coefficients of the motivating problem
+* void print()
+  * Actions:
+    * Prints the number of variables and the model, if the *debug* option is activated
+* int getNumVariables()
+  * Returns:
+    * The number of decision variables
+* int getObjectiveCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getFirstConstraintCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getSecondConstraintCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getThirdConstraintCoefficients(int i)
+  * Parameters:
+    * i: index of the variable
+  * Actions:
+    * Verifies if the index exists
+  * Returns:
+    * The coefficient of a variable
+* int getFirstConstraintMaxValue()
+  * Returns:
+    * The maximum value of the constraint of a variable
+* int getSecondConstraintMaxValue()
+  * Returns:
+    * The maximum value of the constraint of a variable
+* int getThirdConstraintMaxValue()
+  * Returns:
+    * The maximum value of the constraint of a variable
+
 #### Execute.cc
 
 This class is responsible to execute the main process to solve an optimization problem.
@@ -500,11 +923,11 @@ This class is responsible to execute the main process to solve an optimization p
     * Deletes *data* instance
 * void execute()
   * Actions: 
-    * Calls the function [getTme()](#util.h) and sets the start time
+    * Calls the function [getTime()](#util.h) and sets the start time
     * Sets the *data* and the *model* according to the *model* option (it can be [DataCapitalBudgeting](#datacapitalbudgeting.h) and [ModelCapitalBudgeting](#modelcapitalbudgeting), or a defautl [Data](#data.h) and [Model](#model.h))
     * Calls the function [readData()](#data.h)
     * Calls the function [print()](#data.h)
-    * Calls the function [getTme()](#util.h) and calculates the total time
+    * Calls the function [getTime()](#util.h) and calculates the total time
 
 #### Model.cc
 
@@ -649,9 +1072,70 @@ This class is responsible to create and manage a default model object.
     * Finds the constraints of the model
     * Closes the files
 
+#### ModelAssignmentProblem.cc
+
+This class is responsible to create and manage a model object for the Assignment problem.
+
+* Dependencies
+  * [ModelAssignmentProblem.h](#modelassignmentproblem.h)
+  * [Options.h](#options.h)
+  * [DataAssignmentProblem.h](#dataassignmentproblem.h)
+  
+* void reserveSolutionSpace(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Assignmentproblem.
+  * Actions:
+    * Resizes the sol_x matrix
+* void readSolution(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Assignment problem.
+  * Actions:
+    * Calls the function [getNodeCount()](#solver.h)
+    * Calls the function [resetSolution()](#solution.h)
+    * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
+    * If the solution does't exist, prints it
+    * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x matrix
+* void createModel(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Assignment problem.
+  * Actions:
+    * Creates a [DataAssignmentProblem](#dataassignmentproblem.h) instance
+    * Calls the function [getNumVariables](#datacapitalbudgeting.h)
+    * Calls the function [changeObjectiveSense()](#solver.h)
+    * Sends the decision variables to the solver calling [addBinaryVariable()](#solver.h)
+    * Sends the constraints to the solver
+* void printSolutionVariables(int digits = 5, int decimals = 2)
+  * Parameters:
+    * digits: maximum number of digits of the value of the solution
+    * decimals: maximum number of decimal places of the value of the solution
+  * Actions:
+    * Prints the value of each decision variable of the solution, if the *debug* option is activated
+
+* ModelAssignmentProblem()
+  * Constructor
+  * Actions:
+    * Sets V to 0 (zero)
+    * Sets x to "x" 
+* ~ModelAssignmentProblem()
+  * Destructor
+* void execute(const Data *data)
+  * Parameters:
+    * data: the object with the parameters of the Assignment problem.
+  * Actions:
+    * Calls the function [getTime()](#util.h) and set the start time
+    * Calls the function [printSolverName()](#solver.h)
+    * Calls the function createModel(data)
+    * Calls the function reserveSolutionSpace(data)
+    * Calls the function assignWarmStart(data)
+    * Calls the function setSolverParameters(0)
+    * Calls the function [addInfoCallback(this)](#solver.h)
+    * Calls the function solve(data)
+    * Calls the function [getTime()](#util.h) and calculate the total time
+    * Calls the function printSolutionVariables()
+
 #### ModelCapitalBudgeting.cc
 
-This class is responsible to create and manage a model object for the Capital Budgeting problem..
+This class is responsible to create and manage a model object for the Capital Budgeting problem.
 
 * Dependencies
   * [ModelCapitalBudgeting.h](#modelcapitalbudgeting.h)
@@ -672,7 +1156,7 @@ This class is responsible to create and manage a model object for the Capital Bu
     * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
     * If the solution does't exist, prints it
     * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x array
-* void createModel(const Data* data): create a model formatted to the solver
+* void createModel(const Data* data)
   * Parameters:
     * data: the object with the parameters of the Capital Budgeting problem.
   * Actions:
@@ -699,7 +1183,7 @@ This class is responsible to create and manage a model object for the Capital Bu
   * Parameters:
     * data: the object with the parameters of the Capital Budgeting problem.
   * Actions:
-    * Calls the function [getTme()](#util.h) and set the start time
+    * Calls the function [getTime()](#util.h) and set the start time
     * Calls the function [printSolverName()](#solver.h)
     * Calls the function createModel(data)
     * Calls the function reserveSolutionSpace(data)
@@ -707,7 +1191,220 @@ This class is responsible to create and manage a model object for the Capital Bu
     * Calls the function setSolverParameters(1)
     * Calls the function [addInfoCallback(this)](#solver.h)
     * Calls the function solve(data)
-    * Calls the function [getTme()](#util.h) and calculate the total time
+    * Calls the function [getTime()](#util.h) and calculate the total time
+    * Calls the function printSolutionVariables()
+
+#### ModelConcreteMixerTruckRouting.cc
+
+This class is responsible to create and manage a model object for the Concrete Mixer Truck Routing problem.
+
+* Dependencies
+  * [ModelConcreteMixerTruckRouting.h](#modelconcretemixertruckrouting.h)
+  * [Options.h](#options.h)
+  * [DataConcreteMixerTruckRouting.h](#dataconcretemixertruckrouting.h)
+  
+* void reserveSolutionSpace(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Concrete Mixer Truck Routing problem.
+  * Actions:
+    * Resizes the sol_x array
+    * Resizes the sol_y array
+* void readSolution(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Concrete Mixer Truck Routing problem.
+  * Actions:
+    * Calls the function [getNodeCount()](#solver.h)
+    * Calls the function [resetSolution()](#solution.h)
+    * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
+    * If the solution does't exist, prints it
+    * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x and sol_y arrays
+* void createModel(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Concrete Mixer Truck Routing problem.
+  * Actions:
+    * Creates a [DataConcreteMixerTruckRouting](#dataconcretemixertruckrouting.h) instance
+    * Calls the function [getNumberOfConstructions](#dataconcretemixertruckrouting.h)
+    * Calls the function [getConcreteMixerTruckFleet](#dataconcretemixertruckrouting.h)
+    * Calls the function [changeObjectiveSense()](#solver.h)
+    * Sends the decision variables x and y to the solver calling [addBinaryVariable()](#solver.h)
+    * Sends the constraints to the solver
+* void printSolutionVariables(int digits = 5, int decimals = 2)
+  * Parameters:
+    * digits: maximum number of digits of the value of the solution
+    * decimals: maximum number of decimal places of the value of the solution
+  * Actions:
+    * Prints the value of each decision variable of the solution, if the *debug* option is activated
+* vector<SolverCut> separationAlgorithm(vector<double> sol)
+  * Actions:
+    * Creates an object of SolverCut type
+    * Calls the function connectivityCuts
+  * Returns:
+    * The list of cuts
+* void connectivityCuts(const vector<double> &sol, vector<SolverCut> &cuts)
+  * Actions:
+    * Creates a subgraph containing only visited vertices and visited edges
+    * Check if cut is connected
+    * Verifies the connectivity of the graph
+    * Creates the cutting planes
+* int isConnected(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<int> &notConnected)
+  * Actions: 
+    * Creates a vector of visited vertexes
+    * Finds the disconnected vertexes
+    * Creates a list of disconnected vertexes
+  * Returns:
+    * If the quantity of disconnected vertexes is equal 0
+* int disconnectedComponents(const vector<vector<int>> &graph, const vector<vector<double>> &distance, vector<vector<int>> &components)
+  * Actions:
+    * Checks the vertices that have not yet been analyzed
+    * Creates a vector of visited vertexes
+    * Finds the list of disconnected vertexes
+  * Returns:
+    * the list of disconnected vertexes
+
+* ModelConcreteMixerTruckRouting()
+  * Constructor
+  * Actions:
+    * Sets V to 0 (zero)
+    * Sets K to 0 (zero)
+    * Sets x to "x" 
+    * Sets y to "y" 
+* ~ModelConcreteMixerTruckRouting()
+  * Destructor
+* void execute(const Data *data)
+  * Parameters:
+    * data: the object with the parameters of the Capital Budgeting problem.
+  * Actions:
+    * Calls the function [getTime()](#util.h) and set the start time
+    * Calls the function [printSolverName()](#solver.h)
+    * Calls the function createModel(data)
+    * Calls the function reserveSolutionSpace(data)
+    * Calls the function assignWarmStart(data)
+    * Calls the function setSolverParameters(1)
+    * Calls the function [addInfoCallback(this)](#solver.h)
+    * Calls the function solve(data)
+    * Calls the function [getTime()](#util.h) and calculate the total time
+    * Calls the function printSolutionVariables()
+
+#### ModelKnapsackProblem.cc
+
+This class is responsible to create and manage a model object for the Knapsack Problem.
+
+* Dependencies
+  * [ModelKnapsackProblem.h](#modelknapsackproblem.h)
+  * [Options.h](#options.h)
+  * [DataKnapsackProblem.h](#dataknapsackproblem.h)
+  
+* void reserveSolutionSpace(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
+  * Actions:
+    * Resizes the sol_x array
+* void readSolution(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
+  * Actions:
+    * Calls the function [getNodeCount()](#solver.h)
+    * Calls the function [resetSolution()](#solution.h)
+    * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
+    * If the solution does't exist, prints it
+    * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x array
+* void createModel(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
+  * Actions:
+    * Creates a [DataKnapsackProblem](#dataknapsackproblem.h) instance
+    * Calls the function [getNumVariables](#dataknapsackproblem.h)
+    * Calls the function [changeObjectiveSense()](#solver.h)
+    * Sends the decision variables to the solver calling [addBinaryVariable()](#solver.h)
+    * Sends the constraints to the solver
+* void printSolutionVariables(int digits = 5, int decimals = 2)
+  * Parameters:
+    * digits: maximum number of digits of the value of the solution
+    * decimals: maximum number of decimal places of the value of the solution
+  * Actions:
+    * Prints the value of each decision variable of the solution, if the *debug* option is activated
+
+* ModelKnapsackProblem()
+  * Constructor
+  * Actions:
+    * Sets V to 0 (zero)
+    * Sets x to "x" 
+* ~ModelKnapsackProblem()
+  * Destructor
+* void execute(const Data *data)
+  * Parameters:
+    * data: the object with the parameters of the Knapsack problem.
+  * Actions:
+    * Calls the function [getTime()](#util.h) and set the start time
+    * Calls the function [printSolverName()](#solver.h)
+    * Calls the function createModel(data)
+    * Calls the function reserveSolutionSpace(data)
+    * Calls the function assignWarmStart(data)
+    * Calls the function setSolverParameters(1)
+    * Calls the function [addInfoCallback(this)](#solver.h)
+    * Calls the function solve(data)
+    * Calls the function [getTime()](#util.h) and calculate the total time
+    * Calls the function printSolutionVariables()
+
+#### ModelMotivatingProblem.cc
+
+This class is responsible to create and manage a model object for the motivating problem.
+
+* Dependencies
+  * [ModelMotivatingProblem.h](#modelmotivatingproblem.h)
+  * [Options.h](#options.h)
+  * [DataMotivatingProblem.h](#datamotivatingproblem.h)
+  
+* void reserveSolutionSpace(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
+  * Actions:
+    * Resizes the sol_x array
+* void readSolution(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
+  * Actions:
+    * Calls the function [getNodeCount()](#solver.h)
+    * Calls the function [resetSolution()](#solution.h)
+    * Calls the function [setSolutionStatus()](#solution.h) and verify it is optimal, feasible and unbounded
+    * If the solution does't exist, prints it
+    * If the solution exists, calls [setValue()](#solution.h), [setBestBound()](#solution.h) and fills sol_x array
+* void createModel(const Data* data)
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
+  * Actions:
+    * Creates a [DataMotivatingProblem](#datamotivatingproblem.h) instance
+    * Calls the function [getNumVariables](#datamotivatingproblem.h)
+    * Calls the function [changeObjectiveSense()](#solver.h)
+    * Sends the decision variables to the solver calling [addVariable()](#solver.h)
+    * Sends the constraints to the solver
+* void printSolutionVariables(int digits = 5, int decimals = 2)
+  * Parameters:
+    * digits: maximum number of digits of the value of the solution
+    * decimals: maximum number of decimal places of the value of the solution
+  * Actions:
+    * Prints the value of each decision variable of the solution, if the *debug* option is activated
+
+* ModelMotivatingProblem()
+  * Constructor
+  * Actions:
+    * Sets V to 0 (zero)
+    * Sets x to "x" 
+* ~ModelMotivatingProblem()
+  * Destructor
+* void execute(const Data *data)
+  * Parameters:
+    * data: the object with the parameters of the motivating problem.
+  * Actions:
+    * Calls the function [getTime()](#util.h) and set the start time
+    * Calls the function [printSolverName()](#solver.h)
+    * Calls the function createModel(data)
+    * Calls the function reserveSolutionSpace(data)
+    * Calls the function assignWarmStart(data)
+    * Calls the function setSolverParameters(1)
+    * Calls the function [addInfoCallback(this)](#solver.h)
+    * Calls the function solve(data)
+    * Calls the function [getTime()](#util.h) and calculate the total time
     * Calls the function printSolutionVariables()
 
 #### Option.cc
@@ -1251,3 +1948,25 @@ This class is responsible to host all the auxiliary functions.
     * maxNeg: the maximum negative number 
   * Returns:
     * A random double vector
+
+* static vector<vector<int>> transposeIntMatrix(const vector<vector<int> > &original, int xSize, int ySize)
+  * Parameters:
+    * $original: the original matrix
+    * xSize: the size of the x axis
+    * ySize: the size of the x axis
+  * Returns:
+    * The transposed matrix
+* static vector<vector<double>> transposeDoubleMatrix(const vector<vector<double> > &original, int xSize, int ySize)
+  * Parameters:
+    * $original: the original matrix
+    * xSize: the size of the x axis
+    * ySize: the size of the x axis
+  * Returns:
+    * The transposed matrix
+* static vector<vector<string>> transposeStringMatrix(const vector<vector<string> > &original, int xSize, int ySize)
+  * Parameters:
+    * $original: the original matrix
+    * xSize: the size of the x axis
+    * ySize: the size of the x axis
+  * Returns:
+    * The transposed matrix

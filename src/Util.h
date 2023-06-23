@@ -189,6 +189,13 @@ class Util {
         static std::vector<double> randomN(int, bool, double);
 
         /**
+         * Matrix functions
+         */
+        static vector<vector<int>> transposeIntMatrix(const vector<vector<int> > &original, int xSize, int ySize);
+        static vector<vector<double>> transposeDoubleMatrix(const vector<vector<double> > &original, int xSize, int ySize);
+        static vector<vector<string>> transposeStringMatrix(const vector<vector<string> > &original, int xSize, int ySize);
+
+        /**
          * Comparators, sorts, permutations
          */
         template <class T1, class T2>
