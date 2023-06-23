@@ -12,6 +12,7 @@
 #include "Solver.h"
 #include "Data.h"
 #include "Solution.h"
+#include "Options.h"
 
 /**
  * Model, superclass of ssd, etc.
@@ -79,7 +80,7 @@ class Model {
        int maxExportedSolverModels;
        int numExportedSolverModels;
 
-       void setSolverParameters(int isMaximisation, string modelFilename = "bc_model.lp", string solverModelFile = "cplexModel");
+       void setSolverParameters(int isMaximisation, string modelFilename = Options::getInstance()->getStringOption("lp_filename"), string solverModelFile = "cplexModel");
       
        virtual void reserveSolutionSpace(const Data* data) {}
        virtual void readSolution        (const Data* data) {}

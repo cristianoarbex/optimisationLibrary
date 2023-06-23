@@ -386,7 +386,7 @@ void ModelConcreteMixerTruckRouting::connectivityCuts(const vector<double> &sol,
         // preenchimento do novo grafo
         for (unsigned i = 0; i < sol_x_red.size(); i++) {
             int ii = newIndicesToOld[i];
-            for (int j = 0; j < newIndicesToOld.size(); j++) {
+            for (int j = 0; j < (int)newIndicesToOld.size(); j++) {
                 int jj = newIndicesToOld[j];
                 if (oldIndicesToNew[jj] != -1 && ii != jj) {
                     double x_temp = sol[solver->getColIndex(x + lex(k) + UND + lex(ii) + UND + lex(jj))];
@@ -413,7 +413,7 @@ void ModelConcreteMixerTruckRouting::connectivityCuts(const vector<double> &sol,
             // verificação se o novo grafo possui o índice zero, ou seja, se passa pelo depósito
             if (std::find(std::begin(newIndicesToOld), std::end(newIndicesToOld), 0) == std::end(newIndicesToOld)) {
                 addCuts = 1;
-                for (int i = 0; i < oldIndicesToNew.size(); i++) {
+                for (int i = 0; i < (int)oldIndicesToNew.size(); i++) {
                     if (oldIndicesToNew[i] != -1)
                         verticesInCut[0].push_back(oldIndicesToNew[i]);
                 }
@@ -436,9 +436,9 @@ void ModelConcreteMixerTruckRouting::connectivityCuts(const vector<double> &sol,
 
         if (addCuts) {
             // criação dos cutting planes
-            for (int i = 0; i < verticesInCut.size(); i++) {
+            for (int i = 0; i < (int)verticesInCut.size(); i++) {
                 SolverCut cut;
-                for (int j = 1; j < verticesInCut[i].size(); j++) {
+                for (int j = 1; j < (int)verticesInCut[i].size(); j++) {
                     if (newIndicesToOld[verticesInCut[i][j - 1]] != newIndicesToOld[verticesInCut[i][j]]) {
                         // x_(j-1)_j
                         int jj = solver->getColIndex(x + lex(k) + UND + lex(newIndicesToOld[verticesInCut[i][j - 1]]) + UND + lex(newIndicesToOld[verticesInCut[i][j]]));
