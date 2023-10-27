@@ -106,6 +106,11 @@ float Util::getClockTime() {
 }
 
 double Util::getWallTime() {
+    using namespace std::chrono;
+    steady_clock::time_point now = steady_clock::now();
+    duration<double> time_span = duration_cast<duration<double>>(now.time_since_epoch());
+    return time_span.count();
+/*
 #ifdef _WIN32
     LARGE_INTEGER time,freq;
     if (!QueryPerformanceFrequency(&freq)) {
@@ -125,9 +130,8 @@ double Util::getWallTime() {
     }
     return (double) time.tv_sec + (double) time.tv_usec * .000001;
 #endif
+*/
 }
-
-
 
 float Util::getTime() {
 #ifdef _WIN32

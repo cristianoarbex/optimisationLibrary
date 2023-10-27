@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <utility>
 #include <numeric>
+#include <memory>
 #include <limits>
 #include <string>
 #include <vector>
@@ -42,6 +43,7 @@
 #include <fstream>
 #include <sstream>
 #include <math.h>
+#include <chrono>
 //#include <boost/lexical_cast.hpp>
 #include <type_traits>
 //#include "boost/throw_exception.hpp"
