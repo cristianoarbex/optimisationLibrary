@@ -52,7 +52,7 @@ class Solver {
         virtual ~Solver();
         virtual void deleteAndRecreateProblem() {}
         virtual void readProblem(string filename) {}
-
+        virtual int isMIP() {return 0;}
 
         // Map
         int getColIndex(string name);

@@ -27,9 +27,9 @@ if(MSVC)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CLANG TRUE)
   message("CLANG ")
-  set(CMAKE_CXX_FLAGS "-stdlib=libc++ -std=c++11")
+  set(CMAKE_CXX_FLAGS "-stdlib=libc++ -std=c++14")
 else()
-	set(CMAKE_CXX_FLAGS "-g -Wall -O2 -static-libstdc++ -static-libgcc -std=c++11")
+	set(CMAKE_CXX_FLAGS "-g -Wall -O2 -static-libstdc++ -static-libgcc -std=c++14")
 endif()
 
 # Output file is located in the bin directory under the build folder

@@ -9,7 +9,7 @@
 #ifndef CPLEX_H
 #define CPLEX_H
 
-#include <ilcplex/ilocplex.h>
+//#include <ilcplex/ilocplex.h>
 #include <ilcplex/cplex.h>
 #include "Solver.h"
 
@@ -40,7 +40,7 @@ class CPLEX : public Solver {
         virtual ~CPLEX();
         virtual void deleteAndRecreateProblem();
         virtual void readProblem(string filename);
-        
+        virtual int isMIP();
 
         // Set data
         virtual void changeObjectiveSense(bool isMax);

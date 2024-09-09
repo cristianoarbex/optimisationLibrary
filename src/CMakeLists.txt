@@ -47,9 +47,13 @@ if(MSVC)
 	target_compile_definitions(${OPTLIB_COMPILED} PRIVATE IL_STD) 
 endif()
 
-target_link_libraries(${OPTLIB_COMPILED} cplex-library)
-#target_link_libraries(${OPTLIB_COMPILED} cplex-concert)
-target_link_libraries(${OPTLIB_COMPILED} ilocplex)
+# With Google FindCPLEX.cmake, use this
+target_link_libraries(${OPTLIB_COMPILED} CPLEX::CPLEX)
+
+# With Christian FindCPLEX.cmake, use this
+##target_link_libraries(${OPTLIB_COMPILED} cplex-concert)
+#target_link_libraries(${OPTLIB_COMPILED} cplex-library)
+#target_link_libraries(${OPTLIB_COMPILED} ilocplex)
 
 if(NOT MSVC)
 	target_link_libraries(${OPTLIB_COMPILED} pthread)

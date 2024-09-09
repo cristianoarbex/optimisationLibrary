@@ -59,6 +59,11 @@ void CPLEX::printSolverName() {
     printf("Solver used is CPLEX\n");
 }
 
+int CPLEX::isMIP() {
+    int type = CPXgetprobtype(env, problem);
+    return type == CPXPROB_MILP;
+}
+
 int CPLEX::getNumRows() { 
     return CPXgetnumrows(env, problem); 
 }
@@ -72,6 +77,7 @@ void CPLEX::changeObjectiveSense(bool isMax) {
 }
 
 int CPLEX::getNodeCount() { 
+    if (!isMIP()) return 0;    
     return CPXgetnodecnt(env, problem); 
 }
 
